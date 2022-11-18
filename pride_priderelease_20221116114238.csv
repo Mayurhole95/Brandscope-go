@@ -1,0 +1,15 @@
+CatalogueOrder,Integration_ID,BrandscopeCarryOver,Barcode,SKU,ProductName,ProductColourCode,ProductDisplayColour,GenericColour,SizeBreak,AttributeValue,AttributeType,AttributeSequence,DisplayWholesale,DisplayWholesaleRange,WholesalePriceOriginal,WholesalePrice,DisplayRetail,RetailPriceOriginal,RetailPrice,PackUnits,ProductMultiple,AvailableMonths,Divisions,Collections,Categories,DiscountCategory,ProductTags,AgeGroup,Gender,BrandscopeHierarchy,State,ProductRequirement1,ProductSpecification1,ProductSpecification2,ProductSpecification3,ProductSpecification4,ProductSpecification5,ProductSpecification6,ProductSpecification7,ProductSpecification8,ProductSpecification9,ProductSpecification10,ProductSpecification11,ProductSpecification12,ProductSpecification13,ProductSpecification14,ProductSpecification15,ProductChanges1,ProductChanges2,ProductChanges3,ProductChanges4,ProductChanges5,AdditionalDetail1,AdditionalDetail2,AdditionalDetail3,AdditionalDetail4,AdditionalDetail5,SalesTip,MarketingSupport,CompanyName,BrandName,ReleaseName,SegmentNames,AtsInIndent,AtsInInseason,PreOrderLeadTimeDays,PreOrderMessage
+1,15651	,Y,clop12	,167	,Gucci,Black,Black,Black,XL,,,,78,2,76,2,76,76,2,5,0,SEP22,Unassigned,Unassigned,Dry Bag,,,Adult,Male,Dry Bag,Active,Awesome Collection,"Unknown=Awesome Category 
+","Unknown=2-Layer infiDRY 20K Stretch Fabric + DWR 
+",,,,,,,,,,,,,,,,,,,Details 1,,,,,,,clop12,pride,priderelease,,N,Y,,
+3,5615	,Y,clop12	,6b1615	,Gucci,Black,Black,Black,XL,,,,79,500,22,500,22,44,500,6,0,SEP22,Unassigned,Unassigned,Dry Bag,,,Adult,Male,Dry Bag,Active,handbag,"Unknown=handbag 
+",,,,,,,,,,,,,,,,,,,,,,,,,,,clop12,pride,priderelease,,N,Y,,
+3,in6155	,Y,clop12	,bc454	,Gucci,Black,Black,Black,XL,,,,80,500,22,500,22,44,500,67,0,SEP22,Unassigned,Unassigned,Dry Bag,,,Adult,Male,Dry Bag,Active,handbag,"Unknown=handbag 
+",,,,,,,,,,,,,,,,,,,,,,,,,,,clop12,pride,priderelease,,N,Y,,
+3,in5615	,Y,clop12	,bc517	,Gucci,Black,Black,Black,XL,,,,81,2,2,2,2,66,2,66,0,SEP22,Unassigned,Unassigned,Dry Bag,,,Adult,Male,Dry Bag,Active,Awesome Collection,"Unknown=Awesome Category 
+","Unknown=2-Layer infiDRY 20K Stretch Fabric + DWR 
+",,,,,,,,,,,,,,,,,,,Details 1,,,,,,,clop12,pride,priderelease,,N,Y,,
+3,45ji818	,Y,clop12	,cd554	,Gucci,Black,Black,Black,XL,,,,82,500,22,500,22,44,500,8,0,SEP22,Unassigned,Unassigned,Dry Bag,,,Adult,Male,Dry Bag,Active,handbag,"Unknown=handbag 
+",,,,,,,,,,,,,,,,,,,,,,,,,,,clop12,pride,priderelease,,N,Y,,
+4,1237,N,xasel,cedwb,Nike,Black,Black,Black,XL,,,,82,500,22,500,22,44,500,8,0,SEP22,Unassigned,Unassigned,Dry Bag,,,Adult,Male,Dry Bag,Active,handbag,Unknown=handbag ,,,,,,,,,,,,,,,,,,,,,,,,,,,clop12,pride,priderelease,,N,Y,,
+3,45ji8183,N,clop123 ,cd5544 ,Adidas,,,,,,,,90,,,,99,,,9,,SEPTEMBER22,,,,,,Infant,Male,Dry Bag,Active,,,,,,,,,,,,,,,,,,,,,,,,,,,,,clop12,pride,priderelease,,,,,

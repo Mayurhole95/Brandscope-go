@@ -1,0 +1,7 @@
+//GET releases
+//GET http://localhost:3000/releases/206.csv
+//GET http://localhost:3000/products/upload?brand_id=77&release_id=206
+//POST http://localhost:3000/products/upload
+//POST http://localhost:3000/products/upload
+
+https://m.stripe.com/6
