@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/Mayurhole95/Brandscope-go/config"
 	"github.com/jmoiron/sqlx"
-	"github.com/joshsoftware/golang-boilerplate/config"
 	"go.uber.org/zap"
 )
 
