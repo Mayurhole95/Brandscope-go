@@ -1,4 +1,4 @@
-module github.com/joshsoftware/golang-boilerplate
+module github.com/Mayurhole95/Brandscope-go
 
 go 1.17
 

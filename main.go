@@ -3,10 +3,10 @@ package main
 import (
 	"os"
 
-	"github.com/joshsoftware/golang-boilerplate/app"
-	"github.com/joshsoftware/golang-boilerplate/config"
-	"github.com/joshsoftware/golang-boilerplate/db"
-	"github.com/joshsoftware/golang-boilerplate/server"
+	"github.com/Mayurhole95/Brandscope-go/app"
+	"github.com/Mayurhole95/Brandscope-go/config"
+	"github.com/Mayurhole95/Brandscope-go/db"
+	"github.com/Mayurhole95/Brandscope-go/server"
 	"github.com/urfave/cli"
 )
 

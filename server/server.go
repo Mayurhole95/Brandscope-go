@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/joshsoftware/golang-boilerplate/config"
+	"github.com/Mayurhole95/Brandscope-go/config"
 	"github.com/urfave/negroni"
 )
 

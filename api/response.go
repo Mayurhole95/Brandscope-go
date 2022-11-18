@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/joshsoftware/golang-boilerplate/app"
+	"github.com/Mayurhole95/Brandscope-go/app"
 )
 
 type Response struct {

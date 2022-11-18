@@ -3,8 +3,8 @@ package server
 import (
 	"net/http"
 
+	"github.com/Mayurhole95/Brandscope-go/api"
 	"github.com/gorilla/mux"
-	"github.com/joshsoftware/golang-boilerplate/api"
 )
 
 const (
