@@ -19,7 +19,7 @@ type Service interface {
 }
 
 var map_headers = make(map[string]int)
-var data = []BrandHeader{}
+var csvData = []BrandHeader{}
 
 type CsvService struct {
 	store  db.Storer
@@ -42,7 +42,7 @@ func (cs *CsvService) Validate(ctx context.Context, id string) (success Success,
 
 		missingheader, err := HeaderCheck()
 		if err != nil {
-			csvFile, err := os.Create("Dash_Summer 21_20221201121220_errors.csv")
+			csvFile, err := os.Create("pride_priderelease_20221122164529_errors.csv")
 			if err != nil {
 				log.Fatalf("failed creating file: %s", err)
 			}
@@ -54,18 +54,18 @@ func (cs *CsvService) Validate(ctx context.Context, id string) (success Success,
 			csvFile.Close()
 			success.Success = false
 			success.Message = "Headers Missing"
-			success.Filepath = "Dash_Summer 21_20221201121220_errors.csv"
+			success.Filepath = "pride_priderelease_20221122164529_errors.csv"
 			return success, errNoData
 		}
 
 		success.Success = true
 		success.Message = "Headers Found"
 		success.Filepath = ""
-		m, err := cs.store.ListData(brand_id)
+		csvDataMap, err := cs.store.ListData(brand_id)
 		if err != nil {
 			fmt.Println("Error Occured :", err.Error())
 		}
-		errorstring, err := readData(m)
+		errorstring, err := readData(csvDataMap)
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -122,7 +122,6 @@ func HeaderCheck() (missingheader [][]string, err error) {
 
 			missingheaders = missingheaders[1:]
 		}
-		// fmt.Println(" ", count)
 
 	}
 
@@ -134,24 +133,24 @@ func HeaderCheck() (missingheader [][]string, err error) {
 	return missingheaders2d, nil
 }
 
-func readData(data1 map[string]db.Verify) (errorstring string, err error) {
+func readData(dbData map[string]db.Verify) (errorstring string, err error) {
 
 	err = csvtag.LoadFromPath(
 		"pride_priderelease_20221122164529.csv",
-		&data,
+		&csvData,
 		csvtag.CsvOptions{ // Load your csv with optional options
 			Separator: ',', // changes the values separator, default to ','
 		})
 	if err != nil {
 		return "", err
 	}
-	// fmt.Println(err, "Hi")
+
 	var file [][]string
 	f, err := os.Open("pride_priderelease_20221122164529.csv")
 	if err != nil {
 		log.Fatal(err)
 	}
-	// fmt.Println("Hiiiiiiiiiiii")
+
 	// remember to close the file at the end of the program
 	defer f.Close()
 	csvReader := csv.NewReader(f)
@@ -164,17 +163,14 @@ func readData(data1 map[string]db.Verify) (errorstring string, err error) {
 	errorstring = ""
 	str := ""
 	file[0] = append(file[0], "status")
-	// fmt.Println("Hii")
-	// fmt.Println(len(data))
-	// fmt.Println(data)
 	count := 0
-	verified := make(map[string]bool)
-	for i := 0; i < len(data); i++ {
+	verifiedFields := make(map[string]bool)
+	for i := 0; i < len(csvData); i++ {
 		count = 0
 
-		print(verified)
+		print(verifiedFields)
 
-		if _, find := verified[data[i].Integration_ID]; find {
+		if _, find := verifiedFields[csvData[i].Integration_ID]; find {
 			fmt.Println("Found")
 			str = "This product is NOT flagged as a carry-over product, but there is already a product with the SKU/Colour/Size combination."
 			count = 1
@@ -184,8 +180,8 @@ func readData(data1 map[string]db.Verify) (errorstring string, err error) {
 		if count == 1 {
 			continue
 		}
-		if _, ok := data1[data[i].Integration_ID]; ok {
-			if data[i].BrandscopeCarryOver == "N" || data[i].BrandscopeCarryOver == "n" {
+		if _, ok := dbData[csvData[i].Integration_ID]; ok {
+			if csvData[i].BrandscopeCarryOver == "N" || csvData[i].BrandscopeCarryOver == "n" {
 				fmt.Println(i, "Present")
 				str = "Present"
 				errorstring += str
@@ -193,10 +189,10 @@ func readData(data1 map[string]db.Verify) (errorstring string, err error) {
 				fmt.Println(errorstring)
 				count = 1
 			} else {
-				if data1[data[i].Integration_ID].SKU != data[i].SKU || data1[data[i].Integration_ID].Colour_code != data[i].ProductColourCode || data1[data[i].Integration_ID].Size != data[i].SizeBreak {
-					fmt.Println(data1[data[i].Integration_ID].SKU, data[i].SKU)
-					fmt.Println(data1[data[i].Integration_ID].Size, data[i].SizeBreak)
-					fmt.Println(data1[data[i].Integration_ID].Colour_code, data[i].ProductColourCode)
+				if dbData[csvData[i].Integration_ID].SKU != csvData[i].SKU || dbData[csvData[i].Integration_ID].Colour_code != csvData[i].ProductColourCode || dbData[csvData[i].Integration_ID].Size != csvData[i].SizeBreak {
+					fmt.Println(dbData[csvData[i].Integration_ID].SKU, csvData[i].SKU)
+					fmt.Println(dbData[csvData[i].Integration_ID].Size, csvData[i].SizeBreak)
+					fmt.Println(dbData[csvData[i].Integration_ID].Colour_code, csvData[i].ProductColourCode)
 					fmt.Println(i, "This product is flagged as a carry-over product, but there is not a product with the SKU/Colour/Size combination.")
 					str = "This product is flagged as a carry-over product, but there is not a product with the SKU/Colour/Size combination."
 					errorstring += str
@@ -207,7 +203,7 @@ func readData(data1 map[string]db.Verify) (errorstring string, err error) {
 
 			}
 		} else {
-			if data[i].BrandscopeCarryOver == "Y" || data[i].BrandscopeCarryOver == "y" {
+			if csvData[i].BrandscopeCarryOver == "Y" || csvData[i].BrandscopeCarryOver == "y" {
 				fmt.Println(i, "Not Present")
 
 				str = "Not Present"
@@ -221,31 +217,26 @@ func readData(data1 map[string]db.Verify) (errorstring string, err error) {
 			continue
 		}
 
-		str, err = CheckValidations(data[i], i)
+		str, err = CheckValidations(csvData[i], i)
 
 		if str == "ok" {
-			fmt.Println(str, "Hello")
-			verified[data[i].Integration_ID] = true
-			fmt.Println(verified)
-			fmt.Println("Kaise")
+			verifiedFields[csvData[i].Integration_ID] = true
+			fmt.Println(verifiedFields)
+
 		}
-		// else {
-		// 	verified[data[i].Integration_ID] = false
-		// }
 		file[i] = append(file[i], str)
 		if str != "" {
 			errorstring += strconv.Itoa(i)
 		}
 		errorstring += str
 	}
-	// file = append(file, status)
 
 	csvFile, err := os.Create("pride_priderelease_20221122164529.csv")
 	if err != nil {
 		log.Fatalf("failed creating file: %s", err)
 	}
 	csvwriter := csv.NewWriter(csvFile)
-	// fmt.Println("error")
+
 	for i := 0; i < len(file); i++ {
 		_ = csvwriter.Write(file[i])
 	}
