@@ -29,7 +29,6 @@ func AtsInseasonValidation(s string) (err error) {
 	return nil
 }
 
-// function to validate AttributeType
 func AttributeTypeValidation(s string) (err error) {
 
 	if isAlphaNumeric(s) != nil {
@@ -95,7 +94,6 @@ func CatalogueOrderValidation(s string) (err error) {
 
 func CategoriesValidation(s string) (err error) {
 	if isAlphaNumeric(s) != nil {
-		// (isAlphaNumeric(s))
 		return errInvalidCategories
 	}
 	return nil
@@ -118,7 +116,6 @@ func CompanyNameValidation(s string) (err error) {
 	return nil
 }
 
-// function to validate DisplayRetail
 func DisplayRetailValidation(s string) (err error) {
 	if s == "" {
 		return errDisplayRetailEmpty
@@ -129,7 +126,6 @@ func DisplayRetailValidation(s string) (err error) {
 	return nil
 }
 
-// function to validate DisplayWholesale
 func DisplayWholesaleValidation(s string) (err error) {
 	if s == "" {
 		return errDisplayWholesaleEmpty
@@ -165,14 +161,13 @@ func GenericColorValidation(s string) (err error) {
 	return nil
 }
 
-// function to validate Integration_ID
 func Integration_IDValidations(s string, i int) (err error) {
 	if s == "" {
 		fmt.Println("Int id empty")
 		return errIntegration_IDEmpty
 	}
 	for j := 1; j < i; j++ {
-		if s == data[j].Integration_ID {
+		if s == csvData[j].Integration_ID {
 			fmt.Println("Int id exists")
 			return errIntIDExists
 		}
@@ -187,7 +182,6 @@ func MarketingSupportValidation(s string) (err error) {
 	return nil
 }
 
-// function to validate PackUnits
 func PackUnitsValidation(s string) (err error) {
 	if s == "" {
 		return errPackUnitsEmpty
@@ -198,7 +192,6 @@ func PackUnitsValidation(s string) (err error) {
 	return nil
 }
 
-// function to validate ProductColourCode
 func ProductColourCodeValidation(s string) (err error) {
 
 	if isAlphaNumeric(s) != nil {
@@ -210,7 +203,6 @@ func ProductColourCodeValidation(s string) (err error) {
 	return nil
 }
 
-// function to validate ProductDisplayColour
 func ProductDisplayColourValidation(s string) (err error) {
 
 	if isAlphaNumeric(s) != nil {
@@ -230,7 +222,6 @@ func ProductMultipleValidation(s string) (err error) {
 	return nil
 }
 
-// function to validate ProductName
 func ProductNameValidation(s string) (err error) {
 	if s == "" {
 		return errProductNameEmpty
@@ -310,7 +301,7 @@ func SKUValidations(s string, i int) (err error) {
 		return errLength500
 	}
 	for j := 1; j < i; j++ {
-		if s == data[j].SKU {
+		if s == csvData[j].SKU {
 			fmt.Println("SKU exists")
 			return errSKUExists
 		}
@@ -328,10 +319,10 @@ func StateValidation(s string) (err error) {
 func UniqueProductValidations(s string, i int) (err error) {
 
 	for j := 1; j < i; j++ {
-		if strings.EqualFold(strings.ToLower(s), strings.ToLower(data[j].SKU+data[j].ProductColourCode+data[j].SizeBreak)) {
+		if strings.EqualFold(strings.ToLower(s), strings.ToLower(csvData[j].SKU+csvData[j].ProductColourCode+csvData[j].SizeBreak)) {
 			fmt.Println("Similar product exists")
 			return errProductExists
-		} else if data[i].CompanyName == data[j].CompanyName {
+		} else if csvData[i].CompanyName == csvData[j].CompanyName {
 			return errCompanyDoesNotExist
 		}
 
