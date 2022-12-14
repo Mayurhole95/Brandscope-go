@@ -17,7 +17,6 @@ require (
 require (
 	github.com/BurntSushi/toml v1.1.0 // indirect
 	github.com/Microsoft/go-winio v0.5.2 // indirect
-	github.com/artonge/go-csv-tag/v2 v2.1.0
 	github.com/docker/distribution v2.8.1+incompatible // indirect
 	github.com/docker/docker v20.10.16+incompatible // indirect
 	github.com/docker/go-connections v0.4.0 // indirect

@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/Mayurhole95/Brandscope-go/api"
-	csv "github.com/Mayurhole95/Brandscope-go/csv_validate"
 	"github.com/gorilla/mux"
 )
 
@@ -18,8 +17,7 @@ func initRouter(dep dependencies) (router *mux.Router) {
 	router.HandleFunc("/ping", pingHandler).Methods(http.MethodGet)
 
 	//validate
-	router.HandleFunc("/validate", csv.ValidateCSV(dep.csvService)).Methods(http.MethodGet)
-	// router.HandleFunc("/list", csv.List(dep.csvService)).Methods(http.MethodGet)
+	router.HandleFunc("/validate", CSV.validateCSV()).Methods(http.MethodPost)
 
 	return
 }

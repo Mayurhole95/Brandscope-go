@@ -17,21 +17,11 @@ const (
 )
 
 type Storer interface {
-	ListData(id string) (data map[string]Verify, err error)
-	FindID(ctx context.Context, id string, id2 string) (exists bool, err error)
-	ShowTables(ctx context.Context) (ids []int64, err error)
-	FindIntegrationID(brand_id string, integration_id string, size string, sku string, colour_code string) (exists bool, err error)
-}
-
-type Storer1 interface {
-	ListData(id string) (data []entries, err error)
 }
 
 type store struct {
 	db *sqlx.DB
 }
-
-var db1 *sqlx.DB
 
 func newContext(ctx context.Context, tx *sqlx.Tx) context.Context {
 	return context.WithValue(ctx, dbKey, tx)
