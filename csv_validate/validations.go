@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+	"time"
 
 	"strconv"
 )
@@ -42,6 +43,27 @@ func AttributeValueValidation(s string) (err error) {
 	if isAlphaNumeric(s) != nil {
 		return errInvalidData
 	}
+	return nil
+}
+
+func ChangeDateFormat(delivery_month []string) (months []string, err error) {
+	for i := 0; i < len(delivery_month); i++ {
+		date, err := time.Parse("2006-01-02", delivery_month[i])
+		ReturnError(err)
+		year, month, _ := date.Date()
+		delivery_month[i] = strings.ToUpper(month.String()[0:3] + strconv.Itoa(year)[2:4])
+	}
+	fmt.Println(delivery_month)
+	return delivery_month, err
+}
+
+func AvailableMonthsValidations(s string) (err error) {
+	if s == "" {
+		return errAvailableMonthsEmpty
+	}
+	// dates := strings.Split(s, ",")
+	// fmt.Println(dates, Validate.dbMonths)
+
 	return nil
 }
 
@@ -166,6 +188,9 @@ func Integration_IDValidations(s string, i int) (err error) {
 		fmt.Println("Int id empty")
 		return errIntegration_IDEmpty
 	}
+	fmt.Println(csvData)
+	fmt.Println(s, "Hii")
+
 	for j := 1; j < i; j++ {
 		if s == csvData[j].Integration_ID {
 			fmt.Println("Int id exists")
