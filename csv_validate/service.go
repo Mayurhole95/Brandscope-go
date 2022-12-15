@@ -24,11 +24,11 @@ type CsvService struct {
 	logger *zap.SugaredLogger
 }
 
-var file_name string = "Dash_Summer 21_20221201121220.csv"
-var file_name_errors string = "Dash_Summer 21_20221201121220_errors.csv"
+var file_name string = "pride_priderelease_20221215114528.csv"
+var file_name_errors string = "pride_priderelease_20221215114528_errors.csv"
 
 func (cs *CsvService) Validate(ctx context.Context, id string) (success Success, err error) {
-	brand_id := "76"
+	brand_id := "380"
 	release_id := "206"
 
 	exist, err := cs.store.FindID(ctx, brand_id, release_id)
@@ -231,136 +231,136 @@ func CheckValidations(data BrandHeader, i int) (errorstring string, err error) {
 
 	err = AgeGroupValidations(data.AgeGroup)
 	if err == errAgeGroup {
-		errorstring += "AgeGroup==>"
+
 		errorstring += data.AgeGroup
-		errorstring += "is not a valid AgeGroup. Valid values are: Infant, Kid, Youth, Adult or Any"
+		errorstring += InvalidAgeGroup
 	}
 
 	err = AttributeTypeValidation(data.AttributeType)
 	if err == errAttributeTypeNotValid {
-		errorstring += "AttributeType Invalid"
+		errorstring += InvalidAttributeType
 	}
 
-	err = AtsIndentValidation(data.AtsInIndent)
-	if err == errInvalidData {
-		errorstring += "AtsInIndent==> AtsInIndent not valid"
+	err = AtsInIndentValidation(data.AtsInIndent)
+	if err == errInvalidAtsInIndent {
+		errorstring += InvalidAtsInIndent
 	}
 
-	err = AtsInseasonValidation(data.AtsInInSeason)
-	if err == errInvalidData {
-		errorstring += "AtsInInSeason ==> AtsInInSeason not valid"
+	err = AtsInInseasonValidation(data.AtsInInSeason)
+	if err == errInvalidAtsInInSeason {
+		errorstring += InvalidAtsInInSeason
 	}
 
 	err = AttributeValueValidation(data.AttributeValue)
-	if err == errInvalidData {
-		errorstring += "AttributeValue not valid"
+	if err == errInvalidAttributeValue {
+		errorstring += InvalidAttributeValue
 	}
 
 	err = BarcodeValidation(data.Barcode)
-	if err == errInvalidData {
-		errorstring += "Barcode==> Invalid Data .Entry should be alphanumeric, "
+	if err == errInvalidBarcode {
+		errorstring += InvalidBarcode
 	}
 
 	err = BrandscopeCarryOverValidation(data.BrandscopeCarryOver)
 	if err == errBrandScopeCarryOverEmpty {
-		errorstring += "BrandscopeCarryOver==> BrandscopeCarryOver cannot be empty, "
+		errorstring += EmptyBrandscopeCarryOver
 	} else if err == errBrandScopeCarryOverNotValid {
-		errorstring += "BrandscopeCarryOver==> BrandscopeCarryOver not Valid, "
+		errorstring += InvalidBrandscopeCarryOver
 	} else {
 	}
 
 	err = BrandscopeHierarchyValidation(data.BrandscopeHierarchy)
 	if err == errBrandscopeHierarchyEmpty {
-		errorstring += "BrandscopeHierarchy cannot be empty"
+		errorstring += EmptyBrandscopeHierarchy
 	}
 
 	err = BrandNameValidation(data.BrandName)
 	if err == errBrandNameEmpty {
-		errorstring += "BrandName==> BrandName can't be empty"
-	} else if err == errInvalidData {
-		errorstring += "BrandName==> BrandName not valid"
+		errorstring += EmptyBrandName
+	} else if err == errInvalidBrandName {
+		errorstring += InvalidBrandName
 	}
 
 	err = CatalogueOrderValidation(data.CatalogueOrder)
-	if err == errCatalogueOrderEmpty {
-		errorstring += "CatalogueOrder==> CatalogueOrder can't be empty, "
-	} else if err == errCatalogueOrderNotANumber {
-		errorstring += "CatalogueOrder==> CatalogueOrder should be a number, "
+	if err == errCatalogueOrderempty {
+		errorstring += CatalogueOrderEmpty
+	} else if err == errCatalogueOrderNotaNumber {
+		errorstring += CatalogueOrderNotANumber
 	} else {
 	}
 
 	err = CategoriesValidation(data.Categories)
-	//fmt.Println(data.Categories)
+
 	if err == errInvalidCategories {
-		errorstring += "Categories Invalid"
+		errorstring += InvalidCategories
 	}
 
 	err = CollectionsValidation(data.Collections)
 	if err == errInvalidCollections {
-		errorstring += "Collections Invalid"
+		errorstring += InvalidCollections
 	}
 
 	err = CompanyNameValidation(data.CompanyName)
 	if err == errCompanyNameEmpty {
-		errorstring += "CompanyName==> CompanyName can't be empty"
-	} else if err == errInvalidData {
-		errorstring += "CompanyName==> CompanyName not valid"
+		errorstring += EmptyCompanyName
+	} else if err == errInvalidCompanyName {
+		errorstring += InvalidCompanyName
 	}
 
 	err = DisplayRetailValidation(data.DisplayRetail)
 	if err == errDisplayRetailEmpty {
-		errorstring += "DisplayRetail==> DisplayRetail cannot be empty "
-	}
-
-	err = DisplayWholesaleRangeValidation(data.DisplayWholesaleRange)
-	if err == errDisplayWholesaleRangeNotValid {
-		errorstring += "DisplayWholesaleRange  Invalid"
+		errorstring += EmptyDisplayRetail
 	}
 
 	err = DisplayWholesaleValidation(data.DisplayWholesale)
 	if err == errDisplayWholesaleEmpty {
-		errorstring += "DisplayWholesale==> DisplayWholesale cannot be empty, "
+		errorstring += EmptyDisplayWholesale
+	}
+
+	err = DisplayWholesaleRangeValidation(data.DisplayWholesaleRange)
+	if err == errDisplayWholesaleRangeNotValid {
+		errorstring += InvalidDisplayWholesaleRange
 	}
 
 	err = GenderValidations(data.Gender)
 	if err == errGender {
-		errorstring += "Gender==>"
+
 		errorstring += data.Gender
-		errorstring += "is not a valid Gender entered. Valid values are:  Male, Female, Unisex"
+		errorstring += InvalidGender
 	}
 
 	err = GenericColorValidation(data.GenericColour)
-	if err == errInvalidData {
-		errorstring += "GenericColor==> GenericColor not valid"
+	if err == errInvalidGenericColour {
+		errorstring += InvalidGenericColour
 	}
 
 	err = Integration_IDValidations(data.Integration_ID, i)
 	if err == errIntegration_IDEmpty {
-		errorstring += "Int id empty"
-	} else if err == errIntIDExists {
-		errorstring += "Int id exists"
+		errorstring += EmptyIntegration_ID
+	} else if err == errIntIDAlreadyExists {
+		errorstring += Integration_IDAlreadyExists
 	}
 
 	err = MarketingSupportValidation(data.MarketingSupport)
 	if err == errInvalidMarketingSupport {
-		errorstring += "Invalid MarketingSupport"
+		errorstring += InvalidMarketingSupport
 	}
 
 	err = PackUnitsValidation(data.PackUnits)
 	if err == errPackUnitsEmpty {
-		errorstring += "PackUnits cannot be empty"
+		errorstring += EmptyPackUnits
 	} else if err == errInvalidPackUnitsValue {
-		errorstring += "PackUnits should be >=0"
+		errorstring += InvalidPackUnits
 	}
 
 	err = ProductColourCodeValidation(data.ProductColourCode)
 	if err == errProductColourCodeNotValid {
-		errorstring += "ProductColourCode not valid"
+		errorstring += InvalidProductColourCode
 	}
 
 	err = ProductDisplayColourValidation(data.ProductDisplayColour)
 	if err == errProductDisplayColourNotValid {
-		errorstring += "ProductDisplayColour Invalid"
+		errorstring += InvalidProductDisplayColour
 	}
 
 	err = ProductMultipleValidation(data.ProductMultiple)
@@ -370,175 +370,153 @@ func CheckValidations(data BrandHeader, i int) (errorstring string, err error) {
 
 	err = ProductNameValidation(data.ProductName)
 	if err == errProductNameEmpty {
-		errorstring += "ProductName==> ProductName cannot be empty, "
+		errorstring += EmptyProductName
 	}
 
 	err = RetailPriceOriginalValidation(data.RetailPriceOriginal, data.WholesalePrice)
 	if err == errRetailPriceOriginalEmpty {
-		errorstring += " RetailPriceOriginal cannot be empty"
+		errorstring += EmptyRetailPriceOriginal
 	} else if err == errInvalidRetailPriceOriginal {
-		errorstring += "RetailPriceOriginal should be >=0, should be >=WholesalePrice, and cannot have $ symbol"
+		errorstring += InvalidRetailPriceOriginal
 	}
 
 	err = RetailPriceValidation(data.RetailPrice, data.WholesalePrice)
 	if err == errRetailPriceEmpty {
-		errorstring += " RetailPrice cannot be empty"
+		errorstring += EmptyRetailPrice
 	} else if err == errInvalidRetailPriceValue {
-		errorstring += "RetailPrice should be >=0, should be >=WholesalePrice, and cannot have $ symbol"
+		errorstring += InvalidRetailPriceValue
 	}
 
 	err = SalesTipValidation(data.SalesTip)
 	if err == errInvalidSalesTip {
-		errorstring += "Invalid SalesTip"
+		errorstring += InvalidSalesTip
 	}
 
 	err = SegmentNameValidation(data.SegmentNames)
-	if err == errInvalidData {
-		errorstring += "SegmentNames==> SegmentNames not valid"
+	if err == errInvalidSegmentNames {
+		errorstring += InvalidSegmentNames
 	}
 
 	err = SizeBreakValidation(data.SizeBreak)
-	if err == errInvalidData {
-		errorstring += "SizeBreak==> SizeBreak not valid"
+	if err == errInvalidSizeBreak {
+		errorstring += InvalidSizeBreak
 	}
 
 	err = SKUValidations(data.SKU, i)
 	if err == errSKUEmpty {
-		errorstring += "SKU==> SKU can't be empty, "
-	} else if err == errInvalidData {
-		errorstring += "SKU==> Invalid Data .Entry should be alphanumeric, "
+		errorstring += EmptySKU
+	} else if err == errInvalidSKU {
+		errorstring += InvalidSKU
 	} else if err == errLength500 {
-		errorstring += "SKU==> Length should be les than 500, "
+		errorstring += InvalidSKUlength
 	} else {
 	}
 
 	err = WholesalePriceValidation(data.WholesalePrice)
 	if err == errWholesalePriceEmpty {
-		errorstring += "WholesalePrice==> WholesalePrice can't be empty"
-	} else if err == errInvalidData {
-		errorstring += "WholesalePrice==> WholesalePrice not valid"
+		errorstring += EmptyWholesalePrice
+	} else if err == errInvalidWholesalePrice {
+		errorstring += InvalidWholesalePrice
 	}
 
 	err = WholesalePriceOriginalValidation(data.WholesalePriceOriginal)
 	if err == errWholesalePriceOriginalEmpty {
-		errorstring += "WholesalePriceOriginal can't be empty"
-	} else if err == errInvalidData {
-		errorstring += "WholesalePriceOriginal not valid"
+		errorstring += EmptyWholesalePriceOriginal
+	} else if err == errInvalidWholesalePriceOriginal {
+		errorstring += InvalidWholesalePriceOriginal
 	}
 
 	err = StateValidation(data.State)
 	if err == errInvalidState {
-		errorstring += "Invalid State"
+		errorstring += InvalidState
 	}
 
 	err = ProductSpecification1Validation(data.ProductSpecification1)
-	//fmt.Println(data.ProductSpecification1)
 	if err == errInvalidProductSpecification {
-		errorstring += "Invalid ProductSpecification1"
+		errorstring += InvalidProductSpecification1
 	}
 	err = ProductSpecification2Validation(data.ProductSpecification2)
 	if err == errInvalidProductSpecification {
-		errorstring += "Invalid ProductSpecification2"
+		errorstring += InvalidProductSpecification2
 	}
 	err = ProductSpecification3Validation(data.ProductSpecification3)
 	if err == errInvalidProductSpecification {
-		errorstring += "Invalid ProductSpecification3"
+		errorstring += InvalidProductSpecification3
 	}
 	err = ProductSpecification4Validation(data.ProductSpecification4)
 	if err == errInvalidProductSpecification {
-		errorstring += "Invalid ProductSpecification4"
+		errorstring += InvalidProductSpecification4
 	}
 	err = ProductSpecification5Validation(data.ProductSpecification5)
 	if err == errInvalidProductSpecification {
-		errorstring += "Invalid ProductSpecification5"
+		errorstring += InvalidProductSpecification5
 	}
 	err = ProductSpecification6Validation(data.ProductSpecification6)
-	if err == errInvalidData {
-		errorstring += "ProductSpecification6 not valid"
+	if err == errInvalidProductSpecification {
+		errorstring += InvalidProductSpecification6
 	}
 
 	err = ProductSpecification7Validation(data.ProductSpecification7)
-	if err == errInvalidData {
-		errorstring += "ProductSpecification7 not valid"
+	if err == errInvalidProductSpecification {
+		errorstring += InvalidProductSpecification7
 	}
 	err = ProductSpecification8Validation(data.ProductSpecification8)
-	if err == errInvalidData {
-		errorstring += "ProductSpecification8 not valid"
+	if err == errInvalidProductSpecification {
+		errorstring += InvalidProductSpecification8
 	}
 
 	err = ProductSpecification9Validation(data.ProductSpecification9)
-	if err == errInvalidData {
-		errorstring += "ProductSpecification9 not valid"
+	if err == errInvalidProductSpecification {
+		errorstring += InvalidProductSpecification9
 	}
 	err = ProductSpecification10Validation(data.ProductSpecification10)
-	if err == errInvalidData {
-		errorstring += "ProductSpecification10 not valid"
-	}
-	err = ProductSpecification11Validation(data.ProductSpecification1)
-	//fmt.Println(data.ProductSpecification1)
 	if err == errInvalidProductSpecification {
-		errorstring += "Invalid ProductSpecification11"
-	}
-	err = ProductSpecification12Validation(data.ProductSpecification2)
-	if err == errInvalidProductSpecification {
-		errorstring += "Invalid ProductSpecification12"
-	}
-	err = ProductSpecification13Validation(data.ProductSpecification3)
-	if err == errInvalidProductSpecification {
-		errorstring += "Invalid ProductSpecification13"
-	}
-	err = ProductSpecification14Validation(data.ProductSpecification4)
-	if err == errInvalidProductSpecification {
-		errorstring += "Invalid ProductSpecification14"
-	}
-	err = ProductSpecification15Validation(data.ProductSpecification5)
-	if err == errInvalidProductSpecification {
-		errorstring += "Invalid ProductSpecification15"
+		errorstring += InvalidProductSpecification10
 	}
 
 	err = ProductChanges1Validation(data.ProductChanges1)
 	if err == errInvalidProductChanges {
-		errorstring += "Invalid ProductChanges"
+		errorstring += InvalidProductChanges1
 	}
 	err = ProductChanges2Validation(data.ProductChanges2)
 	if err == errInvalidProductChanges {
-		errorstring += "Invalid ProductChanges"
+		errorstring += InvalidProductChanges2
 	}
 	err = ProductChanges3Validation(data.ProductChanges3)
 	if err == errInvalidProductChanges {
-		errorstring += "Invalid ProductChanges"
+		errorstring += InvalidProductChanges3
 	}
 
-	err = ProductChanges4Validation(data.ProductChanges2)
+	err = ProductChanges4Validation(data.ProductChanges4)
 	if err == errInvalidProductChanges {
-		errorstring += "Invalid ProductChanges"
+		errorstring += InvalidProductChanges4
 	}
-	err = ProductChanges5Validation(data.ProductChanges3)
+	err = ProductChanges5Validation(data.ProductChanges5)
 	if err == errInvalidProductChanges {
-		errorstring += "Invalid ProductChanges"
+		errorstring += InvalidProductChanges5
 	}
 
 	err = AdditionalDetail1Validation(data.AdditionalDetail1)
 	if err == errInvalidAdditionalDetail {
-		errorstring += "Invalid AdditionalDetail"
+		errorstring += InvalidAdditionalDetail1
 	}
 	err = AdditionalDetail2Validation(data.AdditionalDetail2)
 	if err == errInvalidAdditionalDetail {
-		errorstring += "Invalid AdditionalDetail"
+		errorstring += InvalidAdditionalDetail2
 	}
 
-	err = AdditionalDetail3Validation(data.AdditionalDetail1)
+	err = AdditionalDetail3Validation(data.AdditionalDetail3)
 	if err == errInvalidAdditionalDetail {
-		errorstring += "Invalid AdditionalDetail"
+		errorstring += InvalidAdditionalDetail3
 	}
-	err = AdditionalDetail4Validation(data.AdditionalDetail2)
+	err = AdditionalDetail4Validation(data.AdditionalDetail4)
 	if err == errInvalidAdditionalDetail {
-		errorstring += "Invalid AdditionalDetail"
+		errorstring += InvalidAdditionalDetail4
 	}
 
-	err = AdditionalDetail5Validation(data.AdditionalDetail1)
+	err = AdditionalDetail5Validation(data.AdditionalDetail5)
 	if err == errInvalidAdditionalDetail {
-		errorstring += "Invalid AdditionalDetail"
+		errorstring += InvalidAdditionalDetail5
 	}
 
 	if errorstring == "" {

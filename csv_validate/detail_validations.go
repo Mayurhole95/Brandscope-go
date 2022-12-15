@@ -105,42 +105,6 @@ func ProductSpecification5Validation(s string) (err error) {
 	return nil
 }
 
-func ProductSpecification11Validation(s string) (err error) {
-
-	if isAlphaNumeric(s) != nil {
-		return errInvalidProductSpecification
-	}
-	return nil
-}
-
-func ProductSpecification12Validation(s string) (err error) {
-	if isAlphaNumeric(s) != nil {
-		return errInvalidProductSpecification
-	}
-	return nil
-}
-
-func ProductSpecification13Validation(s string) (err error) {
-	if isAlphaNumeric(s) != nil {
-		return errInvalidProductSpecification
-	}
-	return nil
-}
-
-func ProductSpecification14Validation(s string) (err error) {
-	if isAlphaNumeric(s) != nil {
-		return errInvalidProductSpecification
-	}
-	return nil
-}
-
-func ProductSpecification15Validation(s string) (err error) {
-	if isAlphaNumeric(s) != nil {
-		return errInvalidProductSpecification
-	}
-	return nil
-}
-
 func ProductSpecification6Validation(s string) (err error) {
 	if isAlphaNumeric(s) != nil {
 		return errInvalidData

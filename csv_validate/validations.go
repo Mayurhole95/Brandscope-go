@@ -16,14 +16,14 @@ func AgeGroupValidations(s string) (err error) {
 	return nil
 }
 
-func AtsIndentValidation(s string) (err error) {
+func AtsInIndentValidation(s string) (err error) {
 	if isAlphaNumeric(s) != nil {
 		return errInvalidData
 	}
 	return nil
 }
 
-func AtsInseasonValidation(s string) (err error) {
+func AtsInInseasonValidation(s string) (err error) {
 	if isAlphaNumeric(s) != nil {
 		return errInvalidData
 	}
@@ -105,11 +105,11 @@ func BrandscopeHierarchyValidation(s string) (err error) {
 func CatalogueOrderValidation(s string) (err error) {
 
 	if s == "" {
-		return errCatalogueOrderEmpty
+		return errCatalogueOrderempty
 	}
 	_, err = strconv.Atoi(s)
 	if err != nil {
-		return errCatalogueOrderNotANumber
+		return errCatalogueOrderNotaNumber
 	}
 	return nil
 }
@@ -185,16 +185,14 @@ func GenericColorValidation(s string) (err error) {
 
 func Integration_IDValidations(s string, i int) (err error) {
 	if s == "" {
-		fmt.Println("Int id empty")
+
 		return errIntegration_IDEmpty
 	}
-	fmt.Println(csvData)
-	fmt.Println(s, "Hii")
 
 	for j := 1; j < i; j++ {
 		if s == csvData[j].Integration_ID {
-			fmt.Println("Int id exists")
-			return errIntIDExists
+
+			return errIntIDAlreadyExists
 		}
 	}
 	return nil
@@ -327,7 +325,7 @@ func SKUValidations(s string, i int) (err error) {
 	}
 	for j := 1; j < i; j++ {
 		if s == csvData[j].SKU {
-			fmt.Println("SKU exists")
+
 			return errSKUExists
 		}
 	}
@@ -345,7 +343,7 @@ func UniqueProductValidations(s string, i int) (err error) {
 
 	for j := 1; j < i; j++ {
 		if strings.EqualFold(strings.ToLower(s), strings.ToLower(csvData[j].SKU+csvData[j].ProductColourCode+csvData[j].SizeBreak)) {
-			fmt.Println("Similar product exists")
+
 			return errProductExists
 		} else if csvData[i].CompanyName == csvData[j].CompanyName {
 			return errCompanyDoesNotExist
