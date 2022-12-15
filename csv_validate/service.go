@@ -203,43 +203,25 @@ func HeaderCheck() (missingheader [][]string, err error) {
 			}
 
 		}
-<<<<<<< HEAD
-		if val == "true" {
-			missingheaders = append(missingheaders, headers[i])
-			missingheaders2d = append(missingheaders2d, [][]string{missingheaders}...)
-
-=======
 		if header_present == "false" {
 			missingheaders = append(missingheaders, headers[column_headers])
 			missingheaders2d = append(missingheaders2d, [][]string{missingheaders}...)
->>>>>>> a7c0e98be135ce77bedc3d6a295fc97c0a9ad2e8
 			missingheaders = missingheaders[1:]
 		}
 
 	}
 
 	if count < len(headers) {
-<<<<<<< HEAD
-		err = errors.New("Missinggg")
-=======
 		err = errors.New(errHeadersMissing)
->>>>>>> a7c0e98be135ce77bedc3d6a295fc97c0a9ad2e8
 		return missingheaders2d, err
 	}
 	err = nil
 	return missingheaders2d, nil
 }
 
-<<<<<<< HEAD
-func readData(dbData map[string]db.Verify) (errorstring string, err error) {
-
-	err = csvtag.LoadFromPath(
-		"pride_priderelease_20221122164529.csv",
-=======
 func readCSVData(dbData map[string]db.Verify) (errorMessage string, err error) {
 	// var CsvData = []BrandHeader{}
 	err = csvtag.LoadFromPath(file_name,
->>>>>>> a7c0e98be135ce77bedc3d6a295fc97c0a9ad2e8
 		&csvData,
 		csvtag.CsvOptions{ // Load your csv with optional options
 			Separator: ',', // changes the values separator, default to ','

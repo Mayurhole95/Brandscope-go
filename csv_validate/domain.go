@@ -1,42 +1,6 @@
 package csv
 
 type BrandHeader struct {
-<<<<<<< HEAD
-	CatalogueOrder         string `csv:"CatalogueOrder"`
-	Integration_ID         string `csv:"Integration_ID"`
-	BrandscopeCarryOver    string `csv:"BrandscopeCarryOver"`
-	Barcode                string `csv:"Barcode"`
-	SKU                    string `csv:"SKU"`
-	ProductName            string `csv:"ProductName"`
-	ProductColourCode      string `csv:"ProductColourCode"`
-	ProductDisplayColour   string `csv:"ProductDisplayColour"`
-	GenericColour          string `csv:"GenericColour"`
-	SizeBreak              string `csv:"SizeBreak"`
-	AttributeValue         string `csv:"AttributeValue"`
-	AttributeType          string `csv:"AttributeType"`
-	AttributeSequence      string `csv:"AttributeSequence"`
-	DisplayWholesaleRange  string `csv:"DisplayWholesaleRange"`
-	PreOrderLeadTimeDays   string `csv:"PreOrderLeadTimeDays"`
-	PreOrderMessage        string `csv:"PreOrderMessage"`
-	DisplayWholesale       string `csv:"DisplayWholesale"`
-	DisplayRetail          string `csv:"DisplayRetail"`
-	PackUnits              string `csv:"PackUnits"`
-	AvailableMonths        string `csv:"AvailableMonths"`
-	AgeGroup               string `csv:"AgeGroup"`
-	Gender                 string `csv:"Gender"`
-	State                  string `csv:"State"`
-	WholesalePriceOriginal string `csv:"WholesalePriceOriginal"`
-	WholesalePrice         string `csv:"WholesalePrice"`
-	RetailPriceOriginal    string `csv:"RetailPriceOriginal"`
-	RetailPrice            string `csv:"RetailPrice"`
-	ProductMultiple        string `csv:"ProductMultiple"`
-	Divisions              string `csv:"Divisions"`
-	Collections            string `csv:"Collections"`
-	Categories             string `csv:"Categories"`
-	DiscountCategory       string `csv:"DiscountCategory"`
-	ProductTags            string `csv:"ProductTags"`
-	BrandscopeHierarchy    string `csv:"BrandscopeHierarchy"`
-=======
 	AttributeValue         string `csv:"AttributeValue"`
 	AttributeType          string `csv:"AttributeType"`
 	AttributeSequence      string `csv:"AttributeSequence"`
@@ -79,7 +43,6 @@ type BrandHeader struct {
 	SKU                    string `csv:"SKU"`
 	WholesalePriceOriginal string `csv:"WholesalePriceOriginal"`
 	WholesalePrice         string `csv:"WholesalePrice"`
->>>>>>> a7c0e98be135ce77bedc3d6a295fc97c0a9ad2e8
 	ProductRequirement1    string `csv:"ProductRequirement1"`
 	ProductSpecification1  string `csv:"ProductSpecification1"`
 	ProductSpecification2  string `csv:"ProductSpecification2"`

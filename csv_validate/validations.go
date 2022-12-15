@@ -4,10 +4,7 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
-<<<<<<< HEAD
-=======
 	"time"
->>>>>>> a7c0e98be135ce77bedc3d6a295fc97c0a9ad2e8
 
 	"strconv"
 )
