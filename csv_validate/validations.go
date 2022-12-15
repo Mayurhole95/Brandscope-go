@@ -46,8 +46,6 @@ func AttributeValueValidation(s string) (err error) {
 	return nil
 }
 
-<<<<<<< HEAD
-=======
 func ChangeDateFormat(delivery_month []string) (months []string, err error) {
 	for i := 0; i < len(delivery_month); i++ {
 		date, err := time.Parse("2006-01-02", delivery_month[i])
@@ -69,7 +67,6 @@ func AvailableMonthsValidations(s string) (err error) {
 	return nil
 }
 
->>>>>>> a7c0e98be135ce77bedc3d6a295fc97c0a9ad2e8
 func BarcodeValidation(s string) (err error) {
 	if isAlphaNumeric(s) != nil {
 		return errInvalidData
@@ -191,12 +188,9 @@ func Integration_IDValidations(s string, i int) (err error) {
 		fmt.Println("Int id empty")
 		return errIntegration_IDEmpty
 	}
-<<<<<<< HEAD
-=======
 	fmt.Println(csvData)
 	fmt.Println(s, "Hii")
 
->>>>>>> a7c0e98be135ce77bedc3d6a295fc97c0a9ad2e8
 	for j := 1; j < i; j++ {
 		if s == csvData[j].Integration_ID {
 			fmt.Println("Int id exists")

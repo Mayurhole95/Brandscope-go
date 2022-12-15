@@ -69,28 +69,8 @@ type BrandHeader struct {
 	AdditionalDetail3      string `csv:"AdditionalDetail3"`
 	AdditionalDetail4      string `csv:"AdditionalDetail4"`
 	AdditionalDetail5      string `csv:"AdditionalDetail5"`
-<<<<<<< HEAD
-	BrandName              string `csv:"BrandName"`
-	ReleaseName            string `csv:"ReleaseName"`
-	SegmentNames           string `csv:"SegmentNames"`
-	AtsInIndent            string `csv:"AtsInIndent"`
-	AtsInInSeason          string `csv:"AtsInInSeason"`
-	SalesTip               string `csv:"SalesTip"`
-	MarketingSupport       string `csv:"MarketingSupport"`
-	CompanyName            string `csv:"CompanyName"`
 }
 
-// type Entries struct {
-// 	Integration_ID string `db:"Integration_id"`
-// 	Size           string `db:"size"`
-// 	SKU            string `db:"sku"`
-// 	Colour_code    string `db:"colour_code"`
-// }
-
-=======
-}
-
->>>>>>> a7c0e98be135ce77bedc3d6a295fc97c0a9ad2e8
 type Verify struct {
 	Size        string `db:"size"`
 	SKU         string `db:"sku"`
@@ -113,10 +93,3 @@ type File_Validation struct {
 	ReleaseID string `text:"release_id"`
 	Format    string `text:"format"`
 }
-<<<<<<< HEAD
-
-// type listTables struct {
-// 	Shows []int64 `json:"tables"`
-// }
-=======
->>>>>>> a7c0e98be135ce77bedc3d6a295fc97c0a9ad2e8
