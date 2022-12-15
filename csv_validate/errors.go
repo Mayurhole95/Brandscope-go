@@ -58,4 +58,12 @@ var (
 	errInvalidCompanyName                    = errors.New("Invalid CompanyName")
 	errEntryFound                            = errors.New("Entry with similar data found")
 	errDataNotAlphanumeric                   = errors.New("Please enter AlphaNumeric Value")
+	errAvailableMonthsEmpty                  = errors.New("AvailableMonths can't be empty")
+
+	errHeadersMissing = "Headers Missing"
+	errHeadersFound   = "Headers Found"
+	errBrandIDExists  = "Brand id doesn't exist"
+	errCarryOverNot   = "This product is NOT flagged as a carry-over product, but there is already a product with the SKU/Colour/Size combination."
+	errCarryOverYes   = "This product is flagged as a carry-over product, but there is not a product with the SKU/Colour/Size combination."
+	perfectEntry      = "ok"
 )
