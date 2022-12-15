@@ -1,6 +1,7 @@
 package csv
 
 type BrandHeader struct {
+<<<<<<< HEAD
 	CatalogueOrder         string `csv:"CatalogueOrder"`
 	Integration_ID         string `csv:"Integration_ID"`
 	BrandscopeCarryOver    string `csv:"BrandscopeCarryOver"`
@@ -35,6 +36,50 @@ type BrandHeader struct {
 	DiscountCategory       string `csv:"DiscountCategory"`
 	ProductTags            string `csv:"ProductTags"`
 	BrandscopeHierarchy    string `csv:"BrandscopeHierarchy"`
+=======
+	AttributeValue         string `csv:"AttributeValue"`
+	AttributeType          string `csv:"AttributeType"`
+	AttributeSequence      string `csv:"AttributeSequence"`
+	AvailableMonths        string `csv:"AvailableMonths"`
+	AtsInIndent            string `csv:"AtsInIndent"`
+	AtsInInSeason          string `csv:"AtsInInSeason"`
+	AgeGroup               string `csv:"AgeGroup"`
+	BrandscopeHierarchy    string `csv:"BrandscopeHierarchy"`
+	BrandscopeCarryOver    string `csv:"BrandscopeCarryOver"`
+	BrandName              string `csv:"BrandName"`
+	Barcode                string `csv:"Barcode"`
+	CompanyName            string `csv:"CompanyName"`
+	Collections            string `csv:"Collections"`
+	Categories             string `csv:"Categories"`
+	CatalogueOrder         string `csv:"CatalogueOrder"`
+	DisplayWholesaleRange  string `csv:"DisplayWholesaleRange"`
+	Divisions              string `csv:"Divisions"`
+	DiscountCategory       string `csv:"DiscountCategory"`
+	DisplayWholesale       string `csv:"DisplayWholesale"`
+	DisplayRetail          string `csv:"DisplayRetail"`
+	GenericColour          string `csv:"GenericColour"`
+	Gender                 string `csv:"Gender"`
+	Integration_ID         string `csv:"Integration_ID"`
+	MarketingSupport       string `csv:"MarketingSupport"`
+	PreOrderLeadTimeDays   string `csv:"PreOrderLeadTimeDays"`
+	PreOrderMessage        string `csv:"PreOrderMessage"`
+	ProductMultiple        string `csv:"ProductMultiple"`
+	ProductTags            string `csv:"ProductTags"`
+	ProductName            string `csv:"ProductName"`
+	ProductColourCode      string `csv:"ProductColourCode"`
+	ProductDisplayColour   string `csv:"ProductDisplayColour"`
+	PackUnits              string `csv:"PackUnits"`
+	RetailPriceOriginal    string `csv:"RetailPriceOriginal"`
+	RetailPrice            string `csv:"RetailPrice"`
+	ReleaseName            string `csv:"ReleaseName"`
+	SegmentNames           string `csv:"SegmentNames"`
+	SalesTip               string `csv:"SalesTip"`
+	SizeBreak              string `csv:"SizeBreak"`
+	State                  string `csv:"State"`
+	SKU                    string `csv:"SKU"`
+	WholesalePriceOriginal string `csv:"WholesalePriceOriginal"`
+	WholesalePrice         string `csv:"WholesalePrice"`
+>>>>>>> a7c0e98be135ce77bedc3d6a295fc97c0a9ad2e8
 	ProductRequirement1    string `csv:"ProductRequirement1"`
 	ProductSpecification1  string `csv:"ProductSpecification1"`
 	ProductSpecification2  string `csv:"ProductSpecification2"`
@@ -61,6 +106,7 @@ type BrandHeader struct {
 	AdditionalDetail3      string `csv:"AdditionalDetail3"`
 	AdditionalDetail4      string `csv:"AdditionalDetail4"`
 	AdditionalDetail5      string `csv:"AdditionalDetail5"`
+<<<<<<< HEAD
 	BrandName              string `csv:"BrandName"`
 	ReleaseName            string `csv:"ReleaseName"`
 	SegmentNames           string `csv:"SegmentNames"`
@@ -78,6 +124,10 @@ type BrandHeader struct {
 // 	Colour_code    string `db:"colour_code"`
 // }
 
+=======
+}
+
+>>>>>>> a7c0e98be135ce77bedc3d6a295fc97c0a9ad2e8
 type Verify struct {
 	Size        string `db:"size"`
 	SKU         string `db:"sku"`
@@ -100,7 +150,10 @@ type File_Validation struct {
 	ReleaseID string `text:"release_id"`
 	Format    string `text:"format"`
 }
+<<<<<<< HEAD
 
 // type listTables struct {
 // 	Shows []int64 `json:"tables"`
 // }
+=======
+>>>>>>> a7c0e98be135ce77bedc3d6a295fc97c0a9ad2e8
