@@ -1,7 +1,6 @@
-package csv
+package csv_validate
 
 import (
-	"fmt"
 	"regexp"
 	"strings"
 	"time"
@@ -53,18 +52,8 @@ func ChangeDateFormat(delivery_month []string) (months []string, err error) {
 		year, month, _ := date.Date()
 		delivery_month[i] = strings.ToUpper(month.String()[0:3] + strconv.Itoa(year)[2:4])
 	}
-	fmt.Println(delivery_month)
+	// fmt.Println(delivery_month)
 	return delivery_month, err
-}
-
-func AvailableMonthsValidations(s string) (err error) {
-	if s == "" {
-		return errAvailableMonthsEmpty
-	}
-	// dates := strings.Split(s, ",")
-	// fmt.Println(dates, Validate.dbMonths)
-
-	return nil
 }
 
 func BarcodeValidation(s string) (err error) {
@@ -185,15 +174,15 @@ func GenericColorValidation(s string) (err error) {
 
 func Integration_IDValidations(s string, i int) (err error) {
 	if s == "" {
-		fmt.Println("Int id empty")
+		// fmt.Println("Int id empty")
 		return errIntegration_IDEmpty
 	}
-	fmt.Println(csvData)
-	fmt.Println(s, "Hii")
+	// fmt.Println(csvData)
+	// fmt.Println(s, "Hii")
 
 	for j := 1; j < i; j++ {
 		if s == csvData[j].Integration_ID {
-			fmt.Println("Int id exists")
+			// fmt.Println("Int id exists")
 			return errIntIDExists
 		}
 	}
@@ -267,7 +256,7 @@ func RetailPriceValidation(s string, s1 string) (err error) {
 
 	val1, err := strconv.ParseFloat(s1, 32)
 	if err != nil {
-		fmt.Println(err)
+		// fmt.Println(err)
 		return
 	}
 	if val, err := strconv.ParseFloat(s, 32); err != nil || val < 0 || val <= val1 || strings.ContainsAny(s, "$") {
@@ -284,7 +273,7 @@ func RetailPriceOriginalValidation(s string, s1 string) (err error) {
 	}
 	val1, err := strconv.ParseFloat(s1, 32)
 	if err != nil {
-		fmt.Println(err)
+		// fmt.Println(err)
 		return
 	}
 	if val, err := strconv.ParseFloat(s, 32); err != nil || val < 0 || val <= val1 || strings.ContainsAny(s, "$") {
@@ -327,7 +316,7 @@ func SKUValidations(s string, i int) (err error) {
 	}
 	for j := 1; j < i; j++ {
 		if s == csvData[j].SKU {
-			fmt.Println("SKU exists")
+			// fmt.Println("SKU exists")
 			return errSKUExists
 		}
 	}
@@ -345,7 +334,7 @@ func UniqueProductValidations(s string, i int) (err error) {
 
 	for j := 1; j < i; j++ {
 		if strings.EqualFold(strings.ToLower(s), strings.ToLower(csvData[j].SKU+csvData[j].ProductColourCode+csvData[j].SizeBreak)) {
-			fmt.Println("Similar product exists")
+			// fmt.Println("Similar product exists")
 			return errProductExists
 		} else if csvData[i].CompanyName == csvData[j].CompanyName {
 			return errCompanyDoesNotExist
