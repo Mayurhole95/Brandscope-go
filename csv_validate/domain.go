@@ -1,4 +1,4 @@
-package csv
+package csv_validate
 
 type BrandHeader struct {
 	AttributeValue         string `csv:"AttributeValue"`
@@ -92,4 +92,10 @@ type File_Validation struct {
 	BrandID   string `text:"brand_id"`
 	ReleaseID string `text:"release_id"`
 	Format    string `text:"format"`
+}
+
+type LogID struct {
+	Original_file_location string `db:"original_file_location"`
+	ReleaseID              string `db:"release_id`
+	BrandID                string `db:"brand_id"`
 }
