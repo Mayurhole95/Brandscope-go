@@ -1,4 +1,4 @@
-package csv
+package csv_validate
 
 func AdditionalDetail1Validation(s string) (err error) {
 	if isAlphaNumeric(s) != nil {
