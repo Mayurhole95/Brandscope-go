@@ -28,6 +28,8 @@ type store struct {
 	db *sqlx.DB
 }
 
+var db1 *sqlx.DB
+
 func newContext(ctx context.Context, tx *sqlx.Tx) context.Context {
 	return context.WithValue(ctx, dbKey, tx)
 }
