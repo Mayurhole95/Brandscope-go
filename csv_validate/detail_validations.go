@@ -1,5 +1,7 @@
 package csv_validate
 
+import "strings"
+
 func AdditionalDetail1Validation(s string) (err error) {
 	if isAlphaNumeric(s) != nil {
 		return errInvalidAdditionalDetail
@@ -33,6 +35,32 @@ func AdditionalDetail5Validation(s string) (err error) {
 		return errInvalidData
 	}
 	return nil
+}
+
+func AvailableMonthsValidations(s string) (err error) {
+	if s == "" {
+		return errAvailableMonthsEmpty
+	}
+	// fmt.Println(s)
+	dates := strings.Split(s, ",")
+
+	if !Equal(dates, dbMonths) {
+		return errAvailableMonthsError
+	}
+
+	return nil
+}
+
+func Equal(a, b []string) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i, v := range a {
+		if v != b[i] {
+			return false
+		}
+	}
+	return true
 }
 
 func ProductChanges1Validation(s string) (err error) {

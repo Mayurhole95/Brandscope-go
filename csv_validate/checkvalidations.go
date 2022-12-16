@@ -31,6 +31,13 @@ func CheckValidations(data BrandHeader, i int) (errorstring string, err error) {
 		errorstring += "AttributeValue not valid"
 	}
 
+	err = AvailableMonthsValidations(data.AvailableMonths)
+	if err == errAvailableMonthsEmpty {
+		errorstring += "Available Months empty"
+	} else if err == errAvailableMonthsError {
+		errorstring += "Available Months error"
+	}
+
 	err = BarcodeValidation(data.Barcode)
 	if err == errInvalidData {
 		errorstring += "Barcode==> Invalid Data .Entry should be alphanumeric, "
