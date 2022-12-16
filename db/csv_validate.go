@@ -17,6 +17,8 @@ const (
 	FROM size_breaks as sb
 	INNER JOIN products ON sb.brand_id = products.brand_id where sb.brand_id=$1 AND sb.product_id=products.id;`
 	checkMonths = `SELECT delivery_months FROM releases WHERE id = $1`
+	findbyLogID = `SELECT original_file_location, release_id, brand_id
+	FROM release_uploads where id=$1;`
 )
 
 func (s *store) ListMonths(release_id string) (months []string, err error) {
@@ -48,6 +50,25 @@ func (s *store) ListData(brand_id string) (data map[string]Verify, err error) {
 	return csvDataMap, err
 }
 
+func (s *store) FindLogID(ctx context.Context, log_id string) (row LogID, err error) {
+
+	err = WithDefaultTimeout(ctx, func(ctx context.Context) error {
+		rows, err := s.db.QueryContext(ctx, findbyLogID, log_id)
+		ReturnError(err)
+		for rows.Next() {
+			err = rows.Scan(
+				&row.Original_file_location, &row.ReleaseID, &row.BrandID,
+			)
+		}
+		return err
+	})
+	if err == sql.ErrNoRows {
+		return row, ErrEmptyData
+	}
+	return row, nil
+
+}
+
 func (s *store) FindID(ctx context.Context, brand_id string, release_id string) (exists bool, err error) {
 
 	err = WithDefaultTimeout(ctx, func(ctx context.Context) error {
@@ -60,7 +81,6 @@ func (s *store) FindID(ctx context.Context, brand_id string, release_id string) 
 		}
 		return err
 	})
-	fmt.Println("Exists : ", exists)
 	if err == sql.ErrNoRows {
 		return exists, ErrEmptyData
 	}
