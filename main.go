@@ -6,13 +6,8 @@ import (
 
 	"github.com/Mayurhole95/Brandscope-go/app"
 	"github.com/Mayurhole95/Brandscope-go/config"
-<<<<<<< HEAD
 	csv_validate "github.com/Mayurhole95/Brandscope-go/csv_validate"
 	"github.com/Mayurhole95/Brandscope-go/db"
-=======
-	"github.com/Mayurhole95/Brandscope-go/db"
-	"github.com/Mayurhole95/Brandscope-go/server"
->>>>>>> 8b4ccc9f32baaca90bbc165e1936b396c96f17da
 	"github.com/urfave/cli"
 )
 
