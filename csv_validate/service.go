@@ -17,7 +17,7 @@ type Service interface {
 	Validate(ctx context.Context, id string) (success Success, err error)
 }
 
-var csvData = []BrandHeader{}
+var csvData []BrandHeader
 
 type CsvService struct {
 	store  db.Storer
@@ -34,38 +34,39 @@ func (cs *CsvService) Validate(ctx context.Context, id string) (success Success,
 	exist, err := cs.store.FindID(ctx, brand_id, release_id)
 	ReturnError(err)
 
-	if exist {
-		missingheader, err := HeaderCheck()
-		if err != nil {
-			csvFile, err := os.Create(file_name)
-			ReturnError(err)
-			csvwriter := csv.NewWriter(csvFile)
-			for i := 0; i < len(missingheader); i++ {
-				_ = csvwriter.Write(missingheader[i])
-			}
-			csvwriter.Flush()
-			csvFile.Close()
-			success = SuccessMessage(false, errHeadersMissing, file_name_errors)
-
-			return success, errNoData
-		}
-		success = SuccessMessage(true, errHeadersFound, "")
-		csvDataMap, err := cs.store.ListData(brand_id)
-		ReturnError(err)
-		months, err := cs.store.ListMonths(release_id)
-		dbMonths, err := ChangeDateFormat(months)
-		fmt.Println(dbMonths)
-		ReturnError(err)
-		errorstring, err := readCSVData(csvDataMap)
-		ReturnError(err)
-		if errorstring == "" {
-			success = SuccessMessage(true, perfectEntry, "")
-		} else {
-			success = SuccessMessage(false, errorstring, "")
-		}
-	} else {
+	if !exist {
 		success = SuccessMessage(false, errBrandIDExists, "")
+		return success, nil
 	}
+	missingheader, err := HeaderCheck()
+	if err != nil {
+		csvFile, err := os.Create(file_name)
+		ReturnError(err)
+		csvwriter := csv.NewWriter(csvFile)
+		for i := 0; i < len(missingheader); i++ {
+			_ = csvwriter.Write(missingheader[i])
+		}
+		csvwriter.Flush()
+		csvFile.Close()
+		success = SuccessMessage(false, errHeadersMissing, file_name_errors)
+
+		return success, errNoData
+	}
+	csvDataMap, err := cs.store.ListData(brand_id)
+	ReturnError(err)
+	months, err := cs.store.ListMonths(release_id)
+	ReturnError(err)
+	dbMonths, err := ChangeDateFormat(months)
+	fmt.Println(dbMonths)
+	ReturnError(err)
+	errorstring, err := readCSVData(csvDataMap)
+	ReturnError(err)
+	if errorstring == "" {
+		success = SuccessMessage(true, perfectEntry, "")
+	} else {
+		success = SuccessMessage(false, errorstring, "")
+	}
+
 	return success, nil
 }
 
@@ -152,24 +153,17 @@ func readCSVData(dbData map[string]db.Verify) (errorMessage string, err error) {
 	errorMessage = ""
 	str := ""
 	file[0] = append(file[0], "status")
-	count := 0
 	verifiedFields := make(map[string]bool)
 	for i := 0; i < len(csvData); i++ {
-		count = 0
 		str = ""
 
 		print(verifiedFields)
 
-		if _, find := verifiedFields[csvData[i].Integration_ID]; find {
-			// fmt.Println("Found")
-			str = errCarryOverNot
-			count = 1
-			// fmt.Println("same")
+		if _, find := verifiedFields[csvData[i].Integration_ID]; !find {
+			continue
 
 		}
-		if count == 1 {
-			continue
-		}
+
 		if _, ok := dbData[csvData[i].Integration_ID]; ok {
 			if csvData[i].BrandscopeCarryOver == "N" || csvData[i].BrandscopeCarryOver == "n" {
 				// fmt.Println(i, "Present")
@@ -177,14 +171,14 @@ func readCSVData(dbData map[string]db.Verify) (errorMessage string, err error) {
 				errorMessage += str
 				file[i] = append(file[i], str)
 				fmt.Println(errorMessage)
-				count = 1
+				continue
 			} else {
 				if dbData[csvData[i].Integration_ID].SKU != csvData[i].SKU || dbData[csvData[i].Integration_ID].Colour_code != csvData[i].ProductColourCode || dbData[csvData[i].Integration_ID].Size != csvData[i].SizeBreak {
 					str = errCarryOverYes
 					errorMessage += str
 					file[i] = append(file[i], str)
 					fmt.Println(errorMessage)
-					count = 1
+					continue
 				}
 
 			}
@@ -194,11 +188,8 @@ func readCSVData(dbData map[string]db.Verify) (errorMessage string, err error) {
 				errorMessage += str
 				file[i] = append(file[i], str)
 				fmt.Println(errorMessage)
-				count = 1
+				continue
 			}
-		}
-		if count == 1 {
-			continue
 		}
 
 		str, err = CheckValidations(csvData[i], i)
@@ -266,7 +257,6 @@ func CheckValidations(data BrandHeader, i int) (errorstring string, err error) {
 		errorstring += EmptyBrandscopeCarryOver
 	} else if err == errBrandScopeCarryOverNotValid {
 		errorstring += InvalidBrandscopeCarryOver
-	} else {
 	}
 
 	err = BrandscopeHierarchyValidation(data.BrandscopeHierarchy)
@@ -286,7 +276,6 @@ func CheckValidations(data BrandHeader, i int) (errorstring string, err error) {
 		errorstring += CatalogueOrderEmpty
 	} else if err == errCatalogueOrderNotaNumber {
 		errorstring += CatalogueOrderNotANumber
-	} else {
 	}
 
 	err = CategoriesValidation(data.Categories)
@@ -339,6 +328,8 @@ func CheckValidations(data BrandHeader, i int) (errorstring string, err error) {
 		errorstring += EmptyIntegration_ID
 	} else if err == errIntIDAlreadyExists {
 		errorstring += Integration_IDAlreadyExists
+	} else if err == errInvalidIntegration_ID {
+		errorstring += InvalidIntegration_ID
 	}
 
 	err = MarketingSupportValidation(data.MarketingSupport)
@@ -364,8 +355,8 @@ func CheckValidations(data BrandHeader, i int) (errorstring string, err error) {
 	}
 
 	err = ProductMultipleValidation(data.ProductMultiple)
-	if err == errInvalidData {
-		errorstring += "ProductMultiple==> ProductMultiple not valid"
+	if err == errInvalidProductMultiple {
+		errorstring += InvalidProductMultiple
 	}
 
 	err = ProductNameValidation(data.ProductName)
@@ -409,7 +400,6 @@ func CheckValidations(data BrandHeader, i int) (errorstring string, err error) {
 		errorstring += InvalidSKU
 	} else if err == errLength500 {
 		errorstring += InvalidSKUlength
-	} else {
 	}
 
 	err = WholesalePriceValidation(data.WholesalePrice)

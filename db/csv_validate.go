@@ -60,7 +60,7 @@ func (s *store) FindID(ctx context.Context, brand_id string, release_id string) 
 		}
 		return err
 	})
-	fmt.Println("Exists : ", exists)
+	//fmt.Println("Exists : ", exists)
 	if err == sql.ErrNoRows {
 		return exists, ErrEmptyData
 	}

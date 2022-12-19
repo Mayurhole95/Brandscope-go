@@ -187,6 +187,8 @@ func Integration_IDValidations(s string, i int) (err error) {
 	if s == "" {
 
 		return errIntegration_IDEmpty
+	} else if isAlphaNumeric(s) != nil {
+		return errInvalidIntegration_ID
 	}
 
 	for j := 1; j < i; j++ {
