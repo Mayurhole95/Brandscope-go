@@ -3,9 +3,9 @@ package db
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"strings"
 
+	"github.com/Mayurhole95/Brandscope-go/utils"
 	_ "github.com/lib/pq"
 )
 
@@ -19,40 +19,40 @@ const (
 	checkMonths = `SELECT delivery_months FROM releases WHERE id = $1`
 )
 
-func (s *store) ListMonths(release_id string) (months []string, err error) {
-	rows, err := s.db.Query(checkMonths, release_id)
-	ReturnError(err)
+func (s *store) ListMonths(releaseID string) (months []string, err error) {
+	rows, err := s.db.Query(checkMonths, releaseID)
+	utils.ReturnError(err)
 	for rows.Next() {
 		var row string
 		err = rows.Scan(&row)
 		row = strings.Trim(row, "{}")
 		months = strings.Split(row, ",")
-		ReturnError(err)
+		utils.ReturnError(err)
 	}
-	ReturnError(err)
+	utils.ReturnError(err)
 
 	return months, err
 }
 
-func (s *store) ListData(brand_id string) (data map[string]Verify, err error) {
+func (s *store) ListData(brandID string) (data map[string]Verify, err error) {
 	csvDataMap := make(map[string]Verify)
-	rows, err := s.db.Query(checkDuplicateEntry, brand_id)
-	ReturnError(err)
+	rows, err := s.db.Query(checkDuplicateEntry, brandID)
+	utils.ReturnError(err)
 	for rows.Next() {
 		var row entries
 		err = rows.Scan(&row.Integration_ID, &row.Size, &row.SKU, &row.Colour_code)
 		csvDataMap[row.Integration_ID] = Verify{row.Size, row.SKU, row.Colour_code}
-		ReturnError(err)
+		utils.ReturnError(err)
 	}
 
 	return csvDataMap, err
 }
 
-func (s *store) FindID(ctx context.Context, brand_id string, release_id string) (exists bool, err error) {
+func (s *store) FindID(ctx context.Context, brandID string, releaseID string) (exists bool, err error) {
 
 	err = WithDefaultTimeout(ctx, func(ctx context.Context) error {
-		rows, err := s.db.QueryContext(ctx, findID, brand_id, release_id)
-		ReturnError(err)
+		rows, err := s.db.QueryContext(ctx, findID, brandID, releaseID)
+		utils.ReturnError(err)
 		for rows.Next() {
 			err = rows.Scan(
 				&exists,
@@ -68,7 +68,7 @@ func (s *store) FindID(ctx context.Context, brand_id string, release_id string) 
 
 }
 
-func (s *store) FindIntegrationID(brand_id string, integration_id string, size string, sku string, colour_code string) (exists bool, err error) {
+func (s *store) FindIntegrationID(brandID string, integrationID string, size string, sku string, colourcode string) (exists bool, err error) {
 
 	rows, err := s.db.Query(checkIntegrationID)
 
@@ -85,11 +85,5 @@ func (s *store) FindIntegrationID(brand_id string, integration_id string, size s
 		return true, nil
 	} else {
 		return false, err
-	}
-}
-func ReturnError(err error) {
-	if err != nil {
-		fmt.Println("Error Occured :", err.Error())
-		return
 	}
 }

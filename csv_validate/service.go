@@ -9,12 +9,13 @@ import (
 	"strconv"
 
 	"github.com/Mayurhole95/Brandscope-go/db"
+	"github.com/Mayurhole95/Brandscope-go/utils"
 	csvtag "github.com/artonge/go-csv-tag/v2"
 	"go.uber.org/zap"
 )
 
 type Service interface {
-	Validate(ctx context.Context, id string) (success Success, err error)
+	Validate(ctx context.Context, id string) (success utils.Success, err error)
 }
 
 var csvData []BrandHeader
@@ -24,199 +25,267 @@ type CsvService struct {
 	logger *zap.SugaredLogger
 }
 
-var file_name string = "pride_priderelease_20221215114528.csv"
-var file_name_errors string = "pride_priderelease_20221215114528_errors.csv"
+var fileName string = "pride_priderelease_20221215114528.csv"
+var fileNameErrors string = "pride_priderelease_20221215114528_errors.csv"
 
-func (cs *CsvService) Validate(ctx context.Context, id string) (success Success, err error) {
-	brand_id := "380"
-	release_id := "206"
+func (cs *CsvService) Validate(ctx context.Context, id string) (success utils.Success, err error) {
+	brandID := "380"
+	releaseID := "206"
 
-	exist, err := cs.store.FindID(ctx, brand_id, release_id)
-	ReturnError(err)
+	exist, err := cs.store.FindID(ctx, brandID, releaseID)
+	utils.ReturnError(err)
 
 	if !exist {
-		success = SuccessMessage(false, errBrandIDExists, "")
+		success = utils.SuccessMessage(false, errBrandIDExists, "")
 		return success, nil
 	}
-	missingheader, err := HeaderCheck()
+	missingheader, err := ValidateHeader()
 	if err != nil {
-		csvFile, err := os.Create(file_name)
-		ReturnError(err)
-		csvwriter := csv.NewWriter(csvFile)
-		for i := 0; i < len(missingheader); i++ {
-			_ = csvwriter.Write(missingheader[i])
-		}
-		csvwriter.Flush()
+		csvFile, err := os.Create(fileNameErrors)
+		utils.ReturnError(err)
+		csvWriter := csv.NewWriter(csvFile)
+
+		// for _, j := range missingheader {
+		// 	_ = csvWriter.Write(j)
+		// }
+		csvWriter.WriteAll(missingheader)
+		csvWriter.Flush()
 		csvFile.Close()
-		success = SuccessMessage(false, errHeadersMissing, file_name_errors)
+		success = utils.SuccessMessage(false, errHeadersMissing, fileNameErrors)
 
 		return success, errNoData
 	}
-	csvDataMap, err := cs.store.ListData(brand_id)
-	ReturnError(err)
-	months, err := cs.store.ListMonths(release_id)
-	ReturnError(err)
+	csvDataMap, err := cs.store.ListData(brandID)
+	utils.ReturnError(err)
+	months, err := cs.store.ListMonths(releaseID)
+	utils.ReturnError(err)
 	dbMonths, err := ChangeDateFormat(months)
 	fmt.Println(dbMonths)
-	ReturnError(err)
-	errorstring, err := readCSVData(csvDataMap)
-	ReturnError(err)
+	utils.ReturnError(err)
+	errorstring, err := ValidateCSVData(csvDataMap)
+	utils.ReturnError(err)
 	if errorstring == "" {
-		success = SuccessMessage(true, perfectEntry, "")
+		success = utils.SuccessMessage(true, perfectEntry, "")
 	} else {
-		success = SuccessMessage(false, errorstring, "")
+		success = utils.SuccessMessage(false, errorstring, "")
 	}
 
 	return success, nil
 }
 
-func ReturnError(err error) {
-	if err != nil {
-		fmt.Println("Error Occured :", err.Error())
-		return
-	}
-}
-
-func SuccessMessage(status bool, message string, filepath string) (success Success) {
-
-	success.Success = status
-	success.Message = message
-	success.Filepath = filepath
-	return success
-
-}
-
-func HeaderCheck() (missingheader [][]string, err error) {
-	var map_headers = make(map[string]int)
-	headers := [23]string{"CatalogueOrder", "BrandscopeCarryOver", "Integration_ID", "Barcode", "SKU", "ProductName", "ProductColourCode", "ProductDisplayColour", "GenericColour", "SizeBreak", "AttributeValue", "AttributeType", "AttributeSequence", "DisplayWholesaleRange", "DisplayWholesale", "DisplayRetail", "PackUnits", "AvailableMonths", "AgeGroup", "Gender", "State", "PreOrderLeadTimeDays", "PreOrderMessage"}
-	missingheaders := make([]string, 0)
-	missingheaders2d := make([][]string, 0)
-	readCsvFile, err := os.Open(file_name)
-	ReturnError(err)
+func readHeaders() []string {
+	readCsvFile, err := os.Open(fileName)
+	utils.ReturnError(err)
 	defer readCsvFile.Close()
 
 	csvReader := csv.NewReader(readCsvFile)
 	records, err := csvReader.Read()
+	utils.ReturnError(err)
+	return records
+}
 
-	ReturnError(err)
+func Iterate(n int) []struct{} {
+	return make([]struct{}, n)
+}
+
+func ValidateHeader() (missingheader [][]string, err error) {
+	var mapHeaders = make(map[string]int)
+	headers := []string{"CatalogueOrder", "BrandscopeCarryOver", "Integration_ID", "Barcode", "SKU", "ProductName", "ProductColourCode", "ProductDisplayColour", "GenericColour", "SizeBreak", "AttributeValue", "AttributeType", "AttributeSequence", "DisplayWholesaleRange", "DisplayWholesale", "DisplayRetail", "PackUnits", "AvailableMonths", "AgeGroup", "Gender", "State", "PreOrderLeadTimeDays", "PreOrderMessage"}
+	missingHeaders := make([]string, 0)
+	missingHeaders2d := make([][]string, 0)
+	records := readHeaders()
 	lenarr := len(records)
 	count := 0
-	for column_headers := 0; column_headers < len(headers); column_headers++ {
-		header_present := "false"
-		for column_csv := 0; column_csv < lenarr; column_csv++ {
-			if headers[column_headers] == records[column_csv] {
-				map_headers[headers[column_headers]] = column_csv
-				header_present = "true"
+	for colHeaders := range Iterate(len(headers)) {
+		headerPresent := "false"
+		for colCsv := range Iterate(lenarr) {
+			if headers[colHeaders] == records[colCsv] {
+				mapHeaders[headers[colHeaders]] = colCsv
+				headerPresent = "true"
 				count = count + 1
 				break
 			}
 
 		}
-		if header_present == "false" {
-			missingheaders = append(missingheaders, headers[column_headers])
-			missingheaders2d = append(missingheaders2d, [][]string{missingheaders}...)
-			missingheaders = missingheaders[1:]
+		if headerPresent == "false" {
+			missingHeaders = append(missingHeaders, headers[colHeaders])
+			missingHeaders2d = append(missingHeaders2d, [][]string{missingHeaders}...)
+			missingHeaders = missingHeaders[1:]
 		}
 
 	}
 
 	if count < len(headers) {
 		err = errors.New(errHeadersMissing)
-		return missingheaders2d, err
+		return missingHeaders2d, err
 	}
 	err = nil
-	return missingheaders2d, nil
+	return missingHeaders2d, nil
 }
 
-func readCSVData(dbData map[string]db.Verify) (errorMessage string, err error) {
+func ValidateCSVData(dbData map[string]db.Verify) (errorMessage string, err error) {
 	// var CsvData = []BrandHeader{}
-	err = csvtag.LoadFromPath(file_name,
+
+	err = csvtag.LoadFromPath(fileName,
 		&csvData,
 		csvtag.CsvOptions{ // Load your csv with optional options
 			Separator: ',', // changes the values separator, default to ','
 		})
+	fmt.Println(csvData)
 	if err != nil {
 		return "", err
 	}
-
-	var file [][]string
-	readCsvFile, err := os.Open(file_name)
-	ReturnError(err)
-
-	// remember to close the file at the end of the program
-	defer readCsvFile.Close()
-	csvReader := csv.NewReader(readCsvFile)
-	// csvReader.FieldsPerRecord = -1
-	file, err = csvReader.ReadAll()
-	ReturnError(err)
-
-	errorMessage = ""
-	str := ""
-	file[0] = append(file[0], "status")
 	verifiedFields := make(map[string]bool)
-	for i := 0; i < len(csvData); i++ {
-		str = ""
 
-		print(verifiedFields)
+	records := make([][]string, 0)
+	headers := readHeaders()
+	headers = append(headers, "status")
+	records = append(records, headers)
 
-		if _, find := verifiedFields[csvData[i].Integration_ID]; !find {
+	for i, c := range csvData {
+		record := c.ToArray()
+		if _, ok := verifiedFields[c.Integration_ID]; !ok {
 			continue
-
+		}
+		fmt.Println("Hii")
+		fmt.Println(record)
+		_, ok := dbData[c.Integration_ID]
+		if ok && c.BrandscopeCarryOver == "N" || c.BrandscopeCarryOver == "n" {
+			errorMessage += errCarryOverNot
+			record = append(record, errCarryOverNot)
+			records = append(records, record)
+			fmt.Println(errorMessage)
+			continue
+		} else if ok && dbData[c.Integration_ID].SKU != c.SKU || dbData[c.Integration_ID].Colour_code != c.ProductColourCode || dbData[c.Integration_ID].Size != c.SizeBreak {
+			errorMessage += errCarryOverYes
+			record = append(record, errCarryOverYes)
+			records = append(records, record)
+			fmt.Println(errorMessage)
+			continue
+		} else if c.BrandscopeCarryOver == "Y" || c.BrandscopeCarryOver == "y" {
+			errorMessage += errCarryOverYes
+			record = append(record, errCarryOverYes)
+			records = append(records, record)
+			fmt.Println(errorMessage)
+			continue
 		}
 
-		if _, ok := dbData[csvData[i].Integration_ID]; ok {
-			if csvData[i].BrandscopeCarryOver == "N" || csvData[i].BrandscopeCarryOver == "n" {
-				// fmt.Println(i, "Present")
-				str = errCarryOverNot
-				errorMessage += str
-				file[i] = append(file[i], str)
-				fmt.Println(errorMessage)
-				continue
-			} else {
-				if dbData[csvData[i].Integration_ID].SKU != csvData[i].SKU || dbData[csvData[i].Integration_ID].Colour_code != csvData[i].ProductColourCode || dbData[csvData[i].Integration_ID].Size != csvData[i].SizeBreak {
-					str = errCarryOverYes
-					errorMessage += str
-					file[i] = append(file[i], str)
-					fmt.Println(errorMessage)
-					continue
-				}
-
-			}
-		} else {
-			if csvData[i].BrandscopeCarryOver == "Y" || csvData[i].BrandscopeCarryOver == "y" {
-				str = errCarryOverYes
-				errorMessage += str
-				file[i] = append(file[i], str)
-				fmt.Println(errorMessage)
-				continue
-			}
-		}
-
-		str, err = CheckValidations(csvData[i], i)
-
-		if str == perfectEntry {
-			verifiedFields[csvData[i].Integration_ID] = true
+		resp, _ := CheckValidations(c, i)
+		// check for error
+		if resp == perfectEntry {
+			verifiedFields[c.Integration_ID] = true
 			fmt.Println(verifiedFields)
 
 		}
-		file[i] = append(file[i], str)
-		if str != "" {
+		record = append(record, resp)
+		if resp != "" {
 			errorMessage += strconv.Itoa(i)
 		}
-		errorMessage += str
+		errorMessage += resp
+		records = append(records, record)
 	}
 
-	csvFile, err := os.Create(file_name)
-	ReturnError(err)
-	csvwriter := csv.NewWriter(csvFile)
+	csvFile, err := os.Create(fileNameErrors)
+	utils.ReturnError(err)
+	csvWriter := csv.NewWriter(csvFile)
 
-	for i := 0; i < len(file); i++ {
-		_ = csvwriter.Write(file[i])
-	}
-	csvwriter.Flush()
+	err = csvWriter.WriteAll(records)
+	utils.ReturnError(err)
+	//handle error
+	csvWriter.Flush()
 	csvFile.Close()
 	return errorMessage, nil
 }
+
+// func ValidateCSVData(dbData map[string]db.Verify) (errorMessage string, err error) {
+// 	// var CsvData = []BrandHeader{}
+// 	err = csvtag.LoadFromPath(fileName,
+// 		&csvData,
+// 		csvtag.CsvOptions{ // Load your csv with optional options
+// 			Separator: ',', // changes the values separator, default to ','
+// 		})
+// 	if err != nil {
+// 		return "", err
+// 	}
+
+// 	var file [][]string
+// 	readCsvFile, err := os.Open(fileName)
+// 	utils.ReturnError(err)(err)
+
+// 	// remember to close the file at the end of the program
+// 	defer readCsvFile.Close()
+// 	csvReader := csv.NewReader(readCsvFile)
+// 	// csvReader.FieldsPerRecord = -1
+// 	file, err = csvReader.ReadAll()
+// 	utils.ReturnError(err)(err)
+
+// 	errorMessage = ""
+// 	str := ""
+// 	file[0] = append(file[0], "status")
+// 	verifiedFields := make(map[string]bool)
+// 	for i := 0; i < len(csvData); i++ {
+// 		str = ""
+
+// 		print(verifiedFields)
+
+// 		if _, find := verifiedFields[csvData[i].Integration_ID]; !find {
+// 			continue
+
+// 		}
+
+// 		if _, ok := dbData[csvData[i].Integration_ID]; ok {
+// 			if csvData[i].BrandscopeCarryOver == "N" || csvData[i].BrandscopeCarryOver == "n" {
+// 				// fmt.Println(i, "Present")
+// 				str = errCarryOverNot
+// 				errorMessage += str
+// 				file[i] = append(file[i], str)
+// 				fmt.Println(errorMessage)
+// 				continue
+// 			} else {
+// 				if dbData[csvData[i].Integration_ID].SKU != csvData[i].SKU || dbData[csvData[i].Integration_ID].Colour_code != csvData[i].ProductColourCode || dbData[csvData[i].Integration_ID].Size != csvData[i].SizeBreak {
+// 					str = errCarryOverYes
+// 					errorMessage += str
+// 					file[i] = append(file[i], str)
+// 					fmt.Println(errorMessage)
+// 					continue
+// 				}
+
+// 			}
+// 		} else {
+// 			if csvData[i].BrandscopeCarryOver == "Y" || csvData[i].BrandscopeCarryOver == "y" {
+// 				str = errCarryOverYes
+// 				errorMessage += str
+// 				file[i] = append(file[i], str)
+// 				fmt.Println(errorMessage)
+// 				continue
+// 			}
+// 		}
+
+// 		str, err = CheckValidations(csvData[i], i)
+
+// 		if str == perfectEntry {
+// 			verifiedFields[csvData[i].Integration_ID] = true
+// 			fmt.Println(verifiedFields)
+
+// 		}
+// 		file[i] = append(file[i], str)
+// 		if str != "" {
+// 			errorMessage += strconv.Itoa(i)
+// 		}
+// 		errorMessage += str
+// 	}
+
+// 	csvFile, err := os.Create(fileNameErrors)
+// 	utils.ReturnError(err)(err)
+// 	csvWriter := csv.NewWriter(csvFile)
+
+// 	for i := 0; i < len(file); i++ {
+// 		_ = csvWriter.Write(file[i])
+// 	}
+// 	csvWriter.Flush()
+// 	csvFile.Close()
+// 	return errorMessage, nil
+// }
 
 func CheckValidations(data BrandHeader, i int) (errorstring string, err error) {
 
@@ -421,91 +490,92 @@ func CheckValidations(data BrandHeader, i int) (errorstring string, err error) {
 		errorstring += InvalidState
 	}
 
-	err = ProductSpecification1Validation(data.ProductSpecification1)
-	if err == errInvalidProductSpecification {
+	errstr := SpecificationValidation("1", data.ProductSpecification1)
+	if errstr == "1" {
 		errorstring += InvalidProductSpecification1
 	}
-	err = ProductSpecification2Validation(data.ProductSpecification2)
-	if err == errInvalidProductSpecification {
+	errstr = SpecificationValidation("2", data.ProductSpecification2)
+	if errstr == "2" {
 		errorstring += InvalidProductSpecification2
 	}
-	err = ProductSpecification3Validation(data.ProductSpecification3)
-	if err == errInvalidProductSpecification {
+	errstr = SpecificationValidation("3", data.ProductSpecification3)
+	if errstr == "3" {
 		errorstring += InvalidProductSpecification3
 	}
-	err = ProductSpecification4Validation(data.ProductSpecification4)
-	if err == errInvalidProductSpecification {
+	errstr = SpecificationValidation("4", data.ProductSpecification4)
+	if errstr == "4" {
 		errorstring += InvalidProductSpecification4
 	}
-	err = ProductSpecification5Validation(data.ProductSpecification5)
-	if err == errInvalidProductSpecification {
+	errstr = SpecificationValidation("5", data.ProductSpecification5)
+	if errstr == "5" {
 		errorstring += InvalidProductSpecification5
 	}
-	err = ProductSpecification6Validation(data.ProductSpecification6)
-	if err == errInvalidProductSpecification {
+	errstr = SpecificationValidation("6", data.ProductSpecification6)
+	if errstr == "6" {
 		errorstring += InvalidProductSpecification6
 	}
 
-	err = ProductSpecification7Validation(data.ProductSpecification7)
-	if err == errInvalidProductSpecification {
+	errstr = SpecificationValidation("7", data.ProductSpecification7)
+	if errstr == "7" {
 		errorstring += InvalidProductSpecification7
 	}
-	err = ProductSpecification8Validation(data.ProductSpecification8)
-	if err == errInvalidProductSpecification {
+	errstr = SpecificationValidation("8", data.ProductSpecification8)
+	if errstr == "8" {
 		errorstring += InvalidProductSpecification8
 	}
 
-	err = ProductSpecification9Validation(data.ProductSpecification9)
-	if err == errInvalidProductSpecification {
+	errstr = SpecificationValidation("9", data.ProductSpecification9)
+	if errstr == "9" {
 		errorstring += InvalidProductSpecification9
 	}
-	err = ProductSpecification10Validation(data.ProductSpecification10)
-	if err == errInvalidProductSpecification {
+	errstr = SpecificationValidation("10", data.ProductSpecification4)
+	if errstr == "10" {
 		errorstring += InvalidProductSpecification10
 	}
 
-	err = ProductChanges1Validation(data.ProductChanges1)
-	if err == errInvalidProductChanges {
+	errstr = SpecificationValidation("1", data.ProductChanges1)
+	if errstr == "1" {
 		errorstring += InvalidProductChanges1
 	}
-	err = ProductChanges2Validation(data.ProductChanges2)
-	if err == errInvalidProductChanges {
+	errstr = SpecificationValidation("2", data.ProductChanges2)
+	if errstr == "2" {
 		errorstring += InvalidProductChanges2
 	}
-	err = ProductChanges3Validation(data.ProductChanges3)
-	if err == errInvalidProductChanges {
+
+	errstr = SpecificationValidation("3", data.ProductChanges3)
+	if errstr == "3" {
 		errorstring += InvalidProductChanges3
 	}
 
-	err = ProductChanges4Validation(data.ProductChanges4)
-	if err == errInvalidProductChanges {
+	errstr = SpecificationValidation("4", data.ProductChanges4)
+	if errstr == "4" {
 		errorstring += InvalidProductChanges4
 	}
-	err = ProductChanges5Validation(data.ProductChanges5)
-	if err == errInvalidProductChanges {
+	errstr = SpecificationValidation("5", data.ProductChanges5)
+	if errstr == "5" {
 		errorstring += InvalidProductChanges5
 	}
 
-	err = AdditionalDetail1Validation(data.AdditionalDetail1)
-	if err == errInvalidAdditionalDetail {
+	errstr = SpecificationValidation("1", data.AdditionalDetail1)
+	if errstr == "1" {
 		errorstring += InvalidAdditionalDetail1
 	}
-	err = AdditionalDetail2Validation(data.AdditionalDetail2)
-	if err == errInvalidAdditionalDetail {
+	errstr = SpecificationValidation("2", data.AdditionalDetail2)
+	if errstr == "2" {
 		errorstring += InvalidAdditionalDetail2
 	}
 
-	err = AdditionalDetail3Validation(data.AdditionalDetail3)
-	if err == errInvalidAdditionalDetail {
+	errstr = SpecificationValidation("3", data.AdditionalDetail3)
+	if errstr == "3" {
 		errorstring += InvalidAdditionalDetail3
 	}
-	err = AdditionalDetail4Validation(data.AdditionalDetail4)
-	if err == errInvalidAdditionalDetail {
+	errstr = SpecificationValidation("4", data.AdditionalDetail4)
+	if errstr == "4" {
 		errorstring += InvalidAdditionalDetail4
 	}
 
-	err = AdditionalDetail5Validation(data.AdditionalDetail5)
-	if err == errInvalidAdditionalDetail {
+	errstr = SpecificationValidation("5", data.AdditionalDetail5)
+	if errstr == "5" {
 		errorstring += InvalidAdditionalDetail5
 	}
 

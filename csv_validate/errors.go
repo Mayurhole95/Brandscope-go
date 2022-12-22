@@ -3,8 +3,6 @@ package csv
 import "errors"
 
 var (
-	errNoData = errors.New("Headers missing")
-
 	errAgeGroup     = errors.New("<AgeGroup> is not a valid AgeGroup. Valid values are: Infant, Kid, Youth, Adult or Any")
 	InvalidAgeGroup = " is not a valid AgeGroup. Valid values are: Infant, Kid, Youth, Adult or Any"
 
@@ -163,19 +161,20 @@ var (
 
 	//-------------------------------------------------------------------------------------
 
+	errNoData           = errors.New("headers missing")
 	sucessfulvalidation = ("Validation Successful")
-	errInvalidData      = errors.New("Invalid Data, please enter Alphanumeric value")
+	errInvalidData      = errors.New("invalid Data, please enter Alphanumeric value")
 
-	errLength80 = errors.New("Length should be less than 80")
+	errLength80 = errors.New("length should be less than 80")
 
-	errSKUExists           = errors.New("Entry with similar SKU exists")
-	errProductExists       = errors.New("Product with similar SKU+ProductColorCode+SizeBreak exists")
-	errProductDoesntExist  = errors.New("This product is flagged as a carry-over, but no product can be found with the SKU/Colour/Size combination of <SKU>/<ProductColourCode>/<SizeBreak>.")
-	errCompanyDoesNotExist = errors.New("Comany does not exist in Brandscope.")
+	errSKUExists           = errors.New("entry with similar SKU exists")
+	errProductExists       = errors.New("product with similar SKU+ProductColorCode+SizeBreak exists")
+	errProductDoesntExist  = errors.New("this product is flagged as a carry-over, but no product can be found with the SKU/Colour/Size combination of <SKU>/<ProductColourCode>/<SizeBreak>.")
+	errCompanyDoesNotExist = errors.New("comany does not exist in Brandscope.")
 
 	errInvalidDisplayWholesaleValue    = errors.New("DisplayWholesale Value should be greater than or equal to 0")
-	errDisplayWholesaleNotANumber      = errors.New("DisplayWholesale Not A Number")
-	errDisplayWholesaleNotAValidAmount = errors.New("DisplayWholesale should be greater than or equal to 0")
+	errDisplayWholesaleNotANumber      = errors.New("displayWholesale Not A Number")
+	errDisplayWholesaleNotAValidAmount = errors.New("displayWholesale should be greater than or equal to 0")
 
 	errEntryFound           = errors.New("Entry with similar data found")
 	errDataNotAlphanumeric  = errors.New("Please enter AlphaNumeric Value")

@@ -17,10 +17,10 @@ const (
 )
 
 type Storer interface {
-	ListData(brand_id string) (data map[string]Verify, err error)
-	FindID(ctx context.Context, brand_id string, release_id string) (exists bool, err error)
-	ListMonths(release_id string) (months []string, err error)
-	FindIntegrationID(brand_id string, integration_id string, size string, sku string, colour_code string) (exists bool, err error)
+	ListData(brandID string) (data map[string]Verify, err error)
+	FindID(ctx context.Context, brandID string, releaseID string) (exists bool, err error)
+	ListMonths(releaseID string) (months []string, err error)
+	FindIntegrationID(brandID string, integrationID string, size string, sku string, colourcode string) (exists bool, err error)
 }
 
 type store struct {
