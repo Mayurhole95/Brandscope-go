@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/joshsoftware/golang-boilerplate/config"
+	"github.com/Mayurhole95/Brandscope-go/config"
 	_ "github.com/lib/pq"
 	"github.com/mattes/migrate"
 	"github.com/mattes/migrate/database"

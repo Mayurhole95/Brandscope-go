@@ -17,11 +17,18 @@ const (
 )
 
 type Storer interface {
+	ListData(brand_id string) (data map[string]Verify, err error)
+	FindLogID(ctx context.Context, log_id string) (row LogID, err error)
+	FindID(ctx context.Context, brand_id string, release_id string) (exists bool, err error)
+	ListMonths(release_id string) (months []string, err error)
+	FindIntegrationID(brand_id string, integration_id string, size string, sku string, colour_code string) (exists bool, err error)
 }
 
 type store struct {
 	db *sqlx.DB
 }
+
+var db1 *sqlx.DB
 
 func newContext(ctx context.Context, tx *sqlx.Tx) context.Context {
 	return context.WithValue(ctx, dbKey, tx)

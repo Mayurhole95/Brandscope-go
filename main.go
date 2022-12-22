@@ -1,12 +1,13 @@
 package main
 
 import (
+	"context"
 	"os"
 
-	"github.com/joshsoftware/golang-boilerplate/app"
-	"github.com/joshsoftware/golang-boilerplate/config"
-	"github.com/joshsoftware/golang-boilerplate/db"
-	"github.com/joshsoftware/golang-boilerplate/server"
+	"github.com/Mayurhole95/Brandscope-go/app"
+	"github.com/Mayurhole95/Brandscope-go/config"
+	csv_validate "github.com/Mayurhole95/Brandscope-go/csv_validate"
+	"github.com/Mayurhole95/Brandscope-go/db"
 	"github.com/urfave/cli"
 )
 
@@ -15,18 +16,33 @@ func main() {
 	app.Init()
 	defer app.Close()
 
+	dbstorer := db.NewStorer(app.GetDB())
+	logger := app.GetLogger()
+
 	cliApp := cli.NewApp()
 	cliApp.Name = "Golang App"
 	cliApp.Version = "1.0.0"
 	cliApp.Commands = []cli.Command{
+		// {
+		// 	Name:  "start",
+		// 	Usage: "start server",
+		// 	Action: func(c *cli.Context) error {
+		// 		server.StartAPIServer()
+		// 		return nil
+		// 	},
+		// },
 		{
-			Name:  "start",
-			Usage: "start server",
+			Name:  "validate",
+			Usage: "run validations code",
 			Action: func(c *cli.Context) error {
-				server.StartAPIServer()
+				// fmt.Println("Hii")
+				csv := csv_validate.NewService(dbstorer, logger)
+
+				csv.Validate(context.TODO(), c.Args().Get(0))
 				return nil
 			},
 		},
+
 		{
 			Name:  "create_migration",
 			Usage: "create migration file",
