@@ -4,8 +4,11 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+	"time"
 
 	"strconv"
+
+	"github.com/Mayurhole95/Brandscope-go/utils"
 )
 
 func AgeGroupValidations(s string) (err error) {
@@ -15,14 +18,14 @@ func AgeGroupValidations(s string) (err error) {
 	return nil
 }
 
-func AtsIndentValidation(s string) (err error) {
+func AtsInIndentValidation(s string) (err error) {
 	if isAlphaNumeric(s) != nil {
 		return errInvalidData
 	}
 	return nil
 }
 
-func AtsInseasonValidation(s string) (err error) {
+func AtsInInseasonValidation(s string) (err error) {
 	if isAlphaNumeric(s) != nil {
 		return errInvalidData
 	}
@@ -42,6 +45,27 @@ func AttributeValueValidation(s string) (err error) {
 	if isAlphaNumeric(s) != nil {
 		return errInvalidData
 	}
+	return nil
+}
+
+func ChangeDateFormat(deliveryMonth []string) (months []string, err error) {
+	for i := range Iterate(len(deliveryMonth)) {
+		date, err := time.Parse("2006-01-02", deliveryMonth[i])
+		utils.ReturnError(err)
+		year, month, _ := date.Date()
+		deliveryMonth[i] = strings.ToUpper(month.String()[0:3] + strconv.Itoa(year)[2:4])
+	}
+	fmt.Println(deliveryMonth)
+	return deliveryMonth, err
+}
+
+func AvailableMonthsValidations(s string) (err error) {
+	if s == "" {
+		return errAvailableMonthsEmpty
+	}
+	// dates := strings.Split(s, ",")
+	// fmt.Println(dates, Validate.dbMonths)
+
 	return nil
 }
 
@@ -83,11 +107,11 @@ func BrandscopeHierarchyValidation(s string) (err error) {
 func CatalogueOrderValidation(s string) (err error) {
 
 	if s == "" {
-		return errCatalogueOrderEmpty
+		return errCatalogueOrderempty
 	}
 	_, err = strconv.Atoi(s)
 	if err != nil {
-		return errCatalogueOrderNotANumber
+		return errCatalogueOrderNotaNumber
 	}
 	return nil
 }
@@ -163,13 +187,16 @@ func GenericColorValidation(s string) (err error) {
 
 func Integration_IDValidations(s string, i int) (err error) {
 	if s == "" {
-		fmt.Println("Int id empty")
+
 		return errIntegration_IDEmpty
+	} else if isAlphaNumeric(s) != nil {
+		return errInvalidIntegration_ID
 	}
-	for j := 1; j < i; j++ {
+
+	for j := range Iterate(i) {
 		if s == csvData[j].Integration_ID {
-			fmt.Println("Int id exists")
-			return errIntIDExists
+
+			return errIntIDAlreadyExists
 		}
 	}
 	return nil
@@ -300,13 +327,21 @@ func SKUValidations(s string, i int) (err error) {
 	if len(s) > 500 {
 		return errLength500
 	}
-	for j := 1; j < i; j++ {
+	for j := range Iterate(i) {
 		if s == csvData[j].SKU {
-			fmt.Println("SKU exists")
+
 			return errSKUExists
 		}
 	}
 	return nil
+}
+
+func SpecificationValidation(specNum string, csvData string) (err string) {
+	if isAlphaNumeric(csvData) != nil {
+		err = specNum
+		return err
+	}
+	return
 }
 
 func StateValidation(s string) (err error) {
@@ -318,9 +353,9 @@ func StateValidation(s string) (err error) {
 
 func UniqueProductValidations(s string, i int) (err error) {
 
-	for j := 1; j < i; j++ {
+	for j := range Iterate(i) {
 		if strings.EqualFold(strings.ToLower(s), strings.ToLower(csvData[j].SKU+csvData[j].ProductColourCode+csvData[j].SizeBreak)) {
-			fmt.Println("Similar product exists")
+
 			return errProductExists
 		} else if csvData[i].CompanyName == csvData[j].CompanyName {
 			return errCompanyDoesNotExist

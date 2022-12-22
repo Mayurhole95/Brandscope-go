@@ -5,640 +5,587 @@ import (
 	"encoding/csv"
 	"errors"
 	"fmt"
-	"log"
 	"os"
 	"strconv"
 
 	"github.com/Mayurhole95/Brandscope-go/db"
+	"github.com/Mayurhole95/Brandscope-go/utils"
 	csvtag "github.com/artonge/go-csv-tag/v2"
 	"go.uber.org/zap"
 )
 
 type Service interface {
-	Validate(ctx context.Context, id string) (success Success, err error)
+	Validate(ctx context.Context, id string) (success utils.Success, err error)
 }
 
-var map_headers = make(map[string]int)
-var csvData = []BrandHeader{}
+var csvData []BrandHeader
 
 type CsvService struct {
 	store  db.Storer
 	logger *zap.SugaredLogger
 }
 
-var brand_id string
-var release_id string
+var fileName string = "pride_priderelease_20221215114528.csv"
+var fileNameErrors string = "pride_priderelease_20221215114528_errors.csv"
 
-func (cs *CsvService) Validate(ctx context.Context, id string) (success Success, err error) {
-	brand_id = "76"
-	release_id = "206"
-	exist, err := cs.store.FindID(ctx, brand_id, release_id)
+func (cs *CsvService) Validate(ctx context.Context, id string) (success utils.Success, err error) {
+	brandID := "380"
+	releaseID := "206"
+
+	exist, err := cs.store.FindID(ctx, brandID, releaseID)
+	utils.ReturnError(err)
+
+	if !exist {
+		success = utils.SuccessMessage(false, errBrandIDExists, "")
+		return success, nil
+	}
+	missingheader, err := ValidateHeader()
 	if err != nil {
-		fmt.Println("Error Occured :", err.Error())
-		return
+		csvFile, err := os.Create(fileNameErrors)
+		utils.ReturnError(err)
+		csvWriter := csv.NewWriter(csvFile)
+
+		// for _, j := range missingheader {
+		// 	_ = csvWriter.Write(j)
+		// }
+		csvWriter.WriteAll(missingheader)
+		csvWriter.Flush()
+		csvFile.Close()
+		success = utils.SuccessMessage(false, errHeadersMissing, fileNameErrors)
+
+		return success, errNoData
 	}
-
-	if exist {
-
-		missingheader, err := HeaderCheck()
-		if err != nil {
-			csvFile, err := os.Create("pride_priderelease_20221122164529_errors.csv")
-			if err != nil {
-				log.Fatalf("failed creating file: %s", err)
-			}
-			csvwriter := csv.NewWriter(csvFile)
-			for i := 0; i < len(missingheader); i++ {
-				_ = csvwriter.Write(missingheader[i])
-			}
-			csvwriter.Flush()
-			csvFile.Close()
-			success.Success = false
-			success.Message = "Headers Missing"
-			success.Filepath = "pride_priderelease_20221122164529_errors.csv"
-			return success, errNoData
-		}
-
-		success.Success = true
-		success.Message = "Headers Found"
-		success.Filepath = ""
-		csvDataMap, err := cs.store.ListData(brand_id)
-		if err != nil {
-			fmt.Println("Error Occured :", err.Error())
-		}
-		errorstring, err := readData(csvDataMap)
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		if errorstring == "" {
-			success.Success = true
-			success.Message = "ok"
-			success.Filepath = ""
-		} else {
-			success.Success = false
-			success.Message = errorstring
-			success.Filepath = ""
-		}
+	csvDataMap, err := cs.store.ListData(brandID)
+	utils.ReturnError(err)
+	months, err := cs.store.ListMonths(releaseID)
+	utils.ReturnError(err)
+	dbMonths, err := ChangeDateFormat(months)
+	fmt.Println(dbMonths)
+	utils.ReturnError(err)
+	errorstring, err := ValidateCSVData(csvDataMap)
+	utils.ReturnError(err)
+	if errorstring == "" {
+		success = utils.SuccessMessage(true, perfectEntry, "")
 	} else {
-		success.Success = false
-		success.Message = "Brand id doesn't exist"
-		success.Filepath = ""
+		success = utils.SuccessMessage(false, errorstring, "")
 	}
+
 	return success, nil
 }
 
-func HeaderCheck() (missingheader [][]string, err error) {
-	headers := [23]string{"CatalogueOrder", "BrandscopeCarryOver", "Integration_ID", "Barcode", "SKU", "ProductName", "ProductColourCode", "ProductDisplayColour", "GenericColour", "SizeBreak", "AttributeValue", "AttributeType", "AttributeSequence", "DisplayWholesaleRange", "DisplayWholesale", "DisplayRetail", "PackUnits", "AvailableMonths", "AgeGroup", "Gender", "State", "PreOrderLeadTimeDays", "PreOrderMessage"}
-	var missingheaders []string
-	missingheaders2d := make([][]string, 0)
-	f, err := os.Open("pride_priderelease_20221122164529.csv")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer f.Close()
+func readHeaders() []string {
+	readCsvFile, err := os.Open(fileName)
+	utils.ReturnError(err)
+	defer readCsvFile.Close()
 
-	csvReader := csv.NewReader(f)
-	rec, err := csvReader.Read()
+	csvReader := csv.NewReader(readCsvFile)
+	records, err := csvReader.Read()
+	utils.ReturnError(err)
+	return records
+}
 
-	if err != nil {
-		log.Fatal(err)
-	}
-	lenarr := len(rec)
+func Iterate(n int) []struct{} {
+	return make([]struct{}, n)
+}
+
+func ValidateHeader() (missingheader [][]string, err error) {
+	var mapHeaders = make(map[string]int)
+	headers := []string{"CatalogueOrder", "BrandscopeCarryOver", "Integration_ID", "Barcode", "SKU", "ProductName", "ProductColourCode", "ProductDisplayColour", "GenericColour", "SizeBreak", "AttributeValue", "AttributeType", "AttributeSequence", "DisplayWholesaleRange", "DisplayWholesale", "DisplayRetail", "PackUnits", "AvailableMonths", "AgeGroup", "Gender", "State", "PreOrderLeadTimeDays", "PreOrderMessage"}
+	missingHeaders := make([]string, 0)
+	missingHeaders2d := make([][]string, 0)
+	records := readHeaders()
+	lenarr := len(records)
 	count := 0
-	for i := 0; i < 23; i++ {
-		val := "true"
-		for j := 0; j < lenarr; j++ {
-			if headers[i] == rec[j] {
-				map_headers[headers[i]] = j
-				val = "false"
+	for colHeaders := range Iterate(len(headers)) {
+		headerPresent := "false"
+		for colCsv := range Iterate(lenarr) {
+			if headers[colHeaders] == records[colCsv] {
+				mapHeaders[headers[colHeaders]] = colCsv
+				headerPresent = "true"
 				count = count + 1
 				break
 			}
 
 		}
-		if val == "true" {
-			missingheaders = append(missingheaders, headers[i])
-			missingheaders2d = append(missingheaders2d, [][]string{missingheaders}...)
-
-			missingheaders = missingheaders[1:]
+		if headerPresent == "false" {
+			missingHeaders = append(missingHeaders, headers[colHeaders])
+			missingHeaders2d = append(missingHeaders2d, [][]string{missingHeaders}...)
+			missingHeaders = missingHeaders[1:]
 		}
 
 	}
 
 	if count < len(headers) {
-		err = errors.New("Missinggg")
-		return missingheaders2d, err
+		err = errors.New(errHeadersMissing)
+		return missingHeaders2d, err
 	}
 	err = nil
-	return missingheaders2d, nil
+	return missingHeaders2d, nil
 }
 
-func readData(dbData map[string]db.Verify) (errorstring string, err error) {
+func ValidateCSVData(dbData map[string]db.Verify) (errorMessage string, err error) {
+	// var CsvData = []BrandHeader{}
 
-	err = csvtag.LoadFromPath(
-		"pride_priderelease_20221122164529.csv",
+	err = csvtag.LoadFromPath(fileName,
 		&csvData,
 		csvtag.CsvOptions{ // Load your csv with optional options
 			Separator: ',', // changes the values separator, default to ','
 		})
+	fmt.Println(csvData)
 	if err != nil {
 		return "", err
 	}
-
-	var file [][]string
-	f, err := os.Open("pride_priderelease_20221122164529.csv")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// remember to close the file at the end of the program
-	defer f.Close()
-	csvReader := csv.NewReader(f)
-	csvReader.FieldsPerRecord = -1
-	file, err = csvReader.ReadAll()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	errorstring = ""
-	str := ""
-	file[0] = append(file[0], "status")
-	count := 0
 	verifiedFields := make(map[string]bool)
-	for i := 0; i < len(csvData); i++ {
-		count = 0
 
-		print(verifiedFields)
+	records := make([][]string, 0)
+	headers := readHeaders()
+	headers = append(headers, "status")
+	records = append(records, headers)
 
-		if _, find := verifiedFields[csvData[i].Integration_ID]; find {
-			fmt.Println("Found")
-			str = "This product is NOT flagged as a carry-over product, but there is already a product with the SKU/Colour/Size combination."
-			count = 1
-			fmt.Println("same")
-
-		}
-		if count == 1 {
+	for i, c := range csvData {
+		record := c.ToArray()
+		if _, ok := verifiedFields[c.Integration_ID]; !ok {
 			continue
 		}
-		if _, ok := dbData[csvData[i].Integration_ID]; ok {
-			if csvData[i].BrandscopeCarryOver == "N" || csvData[i].BrandscopeCarryOver == "n" {
-				fmt.Println(i, "Present")
-				str = "Present"
-				errorstring += str
-				file[i] = append(file[i], str)
-				fmt.Println(errorstring)
-				count = 1
-			} else {
-				if dbData[csvData[i].Integration_ID].SKU != csvData[i].SKU || dbData[csvData[i].Integration_ID].Colour_code != csvData[i].ProductColourCode || dbData[csvData[i].Integration_ID].Size != csvData[i].SizeBreak {
-					fmt.Println(dbData[csvData[i].Integration_ID].SKU, csvData[i].SKU)
-					fmt.Println(dbData[csvData[i].Integration_ID].Size, csvData[i].SizeBreak)
-					fmt.Println(dbData[csvData[i].Integration_ID].Colour_code, csvData[i].ProductColourCode)
-					fmt.Println(i, "This product is flagged as a carry-over product, but there is not a product with the SKU/Colour/Size combination.")
-					str = "This product is flagged as a carry-over product, but there is not a product with the SKU/Colour/Size combination."
-					errorstring += str
-					file[i] = append(file[i], str)
-					fmt.Println(errorstring)
-					count = 1
-				}
-
-			}
-		} else {
-			if csvData[i].BrandscopeCarryOver == "Y" || csvData[i].BrandscopeCarryOver == "y" {
-				fmt.Println(i, "Not Present")
-
-				str = "Not Present"
-				errorstring += str
-				file[i] = append(file[i], str)
-				fmt.Println(errorstring)
-				count = 1
-			}
-		}
-		if count == 1 {
+		fmt.Println("Hii")
+		fmt.Println(record)
+		_, ok := dbData[c.Integration_ID]
+		if ok && c.BrandscopeCarryOver == "N" || c.BrandscopeCarryOver == "n" {
+			errorMessage += errCarryOverNot
+			record = append(record, errCarryOverNot)
+			records = append(records, record)
+			fmt.Println(errorMessage)
+			continue
+		} else if ok && dbData[c.Integration_ID].SKU != c.SKU || dbData[c.Integration_ID].Colour_code != c.ProductColourCode || dbData[c.Integration_ID].Size != c.SizeBreak {
+			errorMessage += errCarryOverYes
+			record = append(record, errCarryOverYes)
+			records = append(records, record)
+			fmt.Println(errorMessage)
+			continue
+		} else if c.BrandscopeCarryOver == "Y" || c.BrandscopeCarryOver == "y" {
+			errorMessage += errCarryOverYes
+			record = append(record, errCarryOverYes)
+			records = append(records, record)
+			fmt.Println(errorMessage)
 			continue
 		}
 
-		str, err = CheckValidations(csvData[i], i)
-
-		if str == "ok" {
-			verifiedFields[csvData[i].Integration_ID] = true
+		resp, _ := CheckValidations(c, i)
+		// check for error
+		if resp == perfectEntry {
+			verifiedFields[c.Integration_ID] = true
 			fmt.Println(verifiedFields)
 
 		}
-		file[i] = append(file[i], str)
-		if str != "" {
-			errorstring += strconv.Itoa(i)
+		record = append(record, resp)
+		if resp != "" {
+			errorMessage += strconv.Itoa(i)
 		}
-		errorstring += str
+		errorMessage += resp
+		records = append(records, record)
 	}
 
-	csvFile, err := os.Create("pride_priderelease_20221122164529.csv")
-	if err != nil {
-		log.Fatalf("failed creating file: %s", err)
-	}
-	csvwriter := csv.NewWriter(csvFile)
+	csvFile, err := os.Create(fileNameErrors)
+	utils.ReturnError(err)
+	csvWriter := csv.NewWriter(csvFile)
 
-	for i := 0; i < len(file); i++ {
-		_ = csvwriter.Write(file[i])
-	}
-	csvwriter.Flush()
+	err = csvWriter.WriteAll(records)
+	utils.ReturnError(err)
+	//handle error
+	csvWriter.Flush()
 	csvFile.Close()
-	return errorstring, nil
+	return errorMessage, nil
 }
 
+// func ValidateCSVData(dbData map[string]db.Verify) (errorMessage string, err error) {
+// 	// var CsvData = []BrandHeader{}
+// 	err = csvtag.LoadFromPath(fileName,
+// 		&csvData,
+// 		csvtag.CsvOptions{ // Load your csv with optional options
+// 			Separator: ',', // changes the values separator, default to ','
+// 		})
+// 	if err != nil {
+// 		return "", err
+// 	}
+
+// 	var file [][]string
+// 	readCsvFile, err := os.Open(fileName)
+// 	utils.ReturnError(err)(err)
+
+// 	// remember to close the file at the end of the program
+// 	defer readCsvFile.Close()
+// 	csvReader := csv.NewReader(readCsvFile)
+// 	// csvReader.FieldsPerRecord = -1
+// 	file, err = csvReader.ReadAll()
+// 	utils.ReturnError(err)(err)
+
+// 	errorMessage = ""
+// 	str := ""
+// 	file[0] = append(file[0], "status")
+// 	verifiedFields := make(map[string]bool)
+// 	for i := 0; i < len(csvData); i++ {
+// 		str = ""
+
+// 		print(verifiedFields)
+
+// 		if _, find := verifiedFields[csvData[i].Integration_ID]; !find {
+// 			continue
+
+// 		}
+
+// 		if _, ok := dbData[csvData[i].Integration_ID]; ok {
+// 			if csvData[i].BrandscopeCarryOver == "N" || csvData[i].BrandscopeCarryOver == "n" {
+// 				// fmt.Println(i, "Present")
+// 				str = errCarryOverNot
+// 				errorMessage += str
+// 				file[i] = append(file[i], str)
+// 				fmt.Println(errorMessage)
+// 				continue
+// 			} else {
+// 				if dbData[csvData[i].Integration_ID].SKU != csvData[i].SKU || dbData[csvData[i].Integration_ID].Colour_code != csvData[i].ProductColourCode || dbData[csvData[i].Integration_ID].Size != csvData[i].SizeBreak {
+// 					str = errCarryOverYes
+// 					errorMessage += str
+// 					file[i] = append(file[i], str)
+// 					fmt.Println(errorMessage)
+// 					continue
+// 				}
+
+// 			}
+// 		} else {
+// 			if csvData[i].BrandscopeCarryOver == "Y" || csvData[i].BrandscopeCarryOver == "y" {
+// 				str = errCarryOverYes
+// 				errorMessage += str
+// 				file[i] = append(file[i], str)
+// 				fmt.Println(errorMessage)
+// 				continue
+// 			}
+// 		}
+
+// 		str, err = CheckValidations(csvData[i], i)
+
+// 		if str == perfectEntry {
+// 			verifiedFields[csvData[i].Integration_ID] = true
+// 			fmt.Println(verifiedFields)
+
+// 		}
+// 		file[i] = append(file[i], str)
+// 		if str != "" {
+// 			errorMessage += strconv.Itoa(i)
+// 		}
+// 		errorMessage += str
+// 	}
+
+// 	csvFile, err := os.Create(fileNameErrors)
+// 	utils.ReturnError(err)(err)
+// 	csvWriter := csv.NewWriter(csvFile)
+
+// 	for i := 0; i < len(file); i++ {
+// 		_ = csvWriter.Write(file[i])
+// 	}
+// 	csvWriter.Flush()
+// 	csvFile.Close()
+// 	return errorMessage, nil
+// }
+
 func CheckValidations(data BrandHeader, i int) (errorstring string, err error) {
-	count := 0
-
-	err = CatalogueOrderValidation(data.CatalogueOrder)
-	if err == errCatalogueOrderEmpty {
-		errorstring += "CatalogueOrder==> CatalogueOrder can't be empty, "
-	} else if err == errCatalogueOrderNotANumber {
-		errorstring += "CatalogueOrder==> CatalogueOrder should be a number, "
-	} else {
-		count += 1
-	}
-
-	err = BarcodeValidation(data.Barcode)
-	if err == errInvalidData {
-		errorstring += "Barcode==> Invalid Data .Entry should be alphanumeric, "
-	} else {
-		count += 1
-	}
-
-	err = SKUValidations(data.SKU, i)
-	if err == errSKUEmpty {
-		errorstring += "SKU==> SKU can't be empty, "
-	} else if err == errInvalidData {
-		errorstring += "SKU==> Invalid Data .Entry should be alphanumeric, "
-	} else if err == errLength500 {
-		errorstring += "SKU==> Length should be les than 500, "
-	} else {
-		count += 1
-	}
-
-	err = BrandscopeCarryOverValidation(data.BrandscopeCarryOver)
-	if err == errBrandScopeCarryOverEmpty {
-		errorstring += "BrandscopeCarryOver==> BrandscopeCarryOver cannot be empty, "
-	} else if err == errBrandScopeCarryOverNotValid {
-		errorstring += "BrandscopeCarryOver==> BrandscopeCarryOver not Valid, "
-	} else {
-		count += 1
-	}
-
-	err = ProductNameValidation(data.ProductName)
-	if err == errProductNameEmpty {
-		errorstring += "ProductName==> ProductName cannot be empty, "
-	} else {
-		count += 1
-	}
-
-	err = GenericColorValidation(data.GenericColour)
-	if err == errInvalidData {
-		errorstring += "GenericColor==> GenericColor not valid"
-	} else {
-		count += 1
-	}
-
-	err = DisplayWholesaleValidation(data.DisplayWholesale)
-	if err == errDisplayWholesaleEmpty {
-		errorstring += "DisplayWholesale==> DisplayWholesale cannot be empty, "
-	} else {
-		count += 1
-	}
-
-	err = DisplayRetailValidation(data.DisplayRetail)
-	if err == errDisplayRetailEmpty {
-		errorstring += "DisplayRetail==> DisplayRetail cannot be empty "
-	} else {
-		count += 1
-
-	}
-
-	err = SizeBreakValidation(data.SizeBreak)
-	if err == errInvalidData {
-		errorstring += "SizeBreak==> SizeBreak not valid"
-	} else {
-		count += 1
-	}
-
-	err = AttributeValueValidation(data.AttributeValue)
-	if err == errInvalidData {
-		errorstring += "AttributeValue not valid"
-	} else {
-		count += 1
-	}
-
-	err = WholesalePriceOriginalValidation(data.WholesalePriceOriginal)
-	if err == errWholesalePriceOriginalEmpty {
-		errorstring += "WholesalePriceOriginal can't be empty"
-	} else if err == errInvalidData {
-		errorstring += "WholesalePriceOriginal not valid"
-	} else {
-		count += 1
-	}
-
-	err = WholesalePriceValidation(data.WholesalePrice)
-	if err == errWholesalePriceEmpty {
-		errorstring += "WholesalePrice==> WholesalePrice can't be empty"
-	} else if err == errInvalidData {
-		errorstring += "WholesalePrice==> WholesalePrice not valid"
-	} else {
-		count += 1
-	}
-
-	err = ProductMultipleValidation(data.ProductMultiple)
-	if err == errInvalidData {
-		errorstring += "ProductMultiple==> ProductMultiple not valid"
-	} else {
-		count += 1
-	}
-
-	err = GenderValidations(data.Gender)
-	if err == errGender {
-		errorstring += "Gender==>"
-		errorstring += data.Gender
-		errorstring += "is not a valid Gender entered. Valid values are:  Male, Female, Unisex"
-	} else {
-		count += 1
-	}
 
 	err = AgeGroupValidations(data.AgeGroup)
 	if err == errAgeGroup {
-		errorstring += "AgeGroup==>"
+
 		errorstring += data.AgeGroup
-		errorstring += "is not a valid AgeGroup. Valid values are: Infant, Kid, Youth, Adult or Any"
-	} else {
-		count += 1
-	}
-
-	err = BrandNameValidation(data.BrandName)
-	if err == errBrandNameEmpty {
-		errorstring += "BrandName==> BrandName can't be empty"
-	} else if err == errInvalidData {
-		errorstring += "BrandName==> BrandName not valid"
-	}
-
-	err = CompanyNameValidation(data.CompanyName)
-	if err == errCompanyNameEmpty {
-		errorstring += "CompanyName==> CompanyName can't be empty"
-	} else if err == errInvalidData {
-		errorstring += "CompanyName==> CompanyName not valid"
-	}
-
-	err = SegmentNameValidation(data.SegmentNames)
-	if err == errInvalidData {
-		errorstring += "SegmentNames==> SegmentNames not valid"
-	} else {
-		count += 1
-	}
-
-	err = AtsIndentValidation(data.AtsInIndent)
-	if err == errInvalidData {
-		errorstring += "AtsInIndent==> AtsInIndent not valid"
-	} else {
-		count += 1
-	}
-
-	err = AtsInseasonValidation(data.AtsInInSeason)
-	if err == errInvalidData {
-		errorstring += "AtsInInSeason ==> AtsInInSeason not valid"
-	} else {
-		count += 1
-	}
-
-	err = Integration_IDValidations(data.Integration_ID, i)
-	if err == errIntegration_IDEmpty {
-		errorstring += "Int id empty"
-	} else if err == errIntIDExists {
-		errorstring += "Int id exists"
-	} else {
-		count += 1
-	}
-
-	err = ProductColourCodeValidation(data.ProductColourCode)
-	if err == errProductColourCodeNotValid {
-		errorstring += "ProductColourCode not valid"
-	}
-
-	err = ProductDisplayColourValidation(data.ProductDisplayColour)
-	if err == errProductDisplayColourNotValid {
-		errorstring += "ProductDisplayColour Invalid"
+		errorstring += InvalidAgeGroup
 	}
 
 	err = AttributeTypeValidation(data.AttributeType)
 	if err == errAttributeTypeNotValid {
-		errorstring += "AttributeType Invalid"
+		errorstring += InvalidAttributeType
 	}
 
-	// err = DisplayWholesaleValidation(data.DisplayWholesale)
-	// if err == errDisplayWholesaleEmpty {
-	// 	errorstring += "DisplayWholesale cannot be empty"
-	// } else if err == errInvalidDisplayWholesaleValue {
-	// 	errorstring += "DisplayWholesale should be >=0 and cannot have $ symbol"
-	// }
-
-	err = DisplayWholesaleRangeValidation(data.DisplayWholesaleRange)
-	if err == errDisplayWholesaleRangeNotValid {
-		errorstring += "DisplayWholesaleRange  Invalid"
+	err = AtsInIndentValidation(data.AtsInIndent)
+	if err == errInvalidAtsInIndent {
+		errorstring += InvalidAtsInIndent
 	}
 
-	err = RetailPriceOriginalValidation(data.RetailPriceOriginal, data.WholesalePrice)
-	//fmt.Println(data.RetailPriceOriginal)
-	//fmt.Println(data.WholesalePrice)
-	if err == errRetailPriceOriginalEmpty {
-		errorstring += " RetailPriceOriginal cannot be empty"
-	} else if err == errInvalidRetailPriceOriginal {
-		errorstring += "RetailPriceOriginal should be >=0, should be >=WholesalePrice, and cannot have $ symbol"
+	err = AtsInInseasonValidation(data.AtsInInSeason)
+	if err == errInvalidAtsInInSeason {
+		errorstring += InvalidAtsInInSeason
 	}
 
-	err = RetailPriceValidation(data.RetailPrice, data.WholesalePrice)
-	//fmt.Println(data.RetailPrice)
-	if err == errRetailPriceEmpty {
-		errorstring += " RetailPrice cannot be empty"
-	} else if err == errInvalidRetailPriceValue {
-		errorstring += "RetailPrice should be >=0, should be >=WholesalePrice, and cannot have $ symbol"
+	err = AttributeValueValidation(data.AttributeValue)
+	if err == errInvalidAttributeValue {
+		errorstring += InvalidAttributeValue
 	}
 
-	err = PackUnitsValidation(data.PackUnits)
-	if err == errPackUnitsEmpty {
-		errorstring += "PackUnits cannot be empty"
-	} else if err == errInvalidPackUnitsValue {
-		errorstring += "PackUnits should be >=0"
+	err = BarcodeValidation(data.Barcode)
+	if err == errInvalidBarcode {
+		errorstring += InvalidBarcode
 	}
 
-	err = CollectionsValidation(data.Collections)
-	if err == errInvalidCollections {
-		errorstring += "Collections Invalid"
-	}
-
-	err = CategoriesValidation(data.Categories)
-	//fmt.Println(data.Categories)
-	if err == errInvalidCategories {
-		errorstring += "Categories Invalid"
+	err = BrandscopeCarryOverValidation(data.BrandscopeCarryOver)
+	if err == errBrandScopeCarryOverEmpty {
+		errorstring += EmptyBrandscopeCarryOver
+	} else if err == errBrandScopeCarryOverNotValid {
+		errorstring += InvalidBrandscopeCarryOver
 	}
 
 	err = BrandscopeHierarchyValidation(data.BrandscopeHierarchy)
 	if err == errBrandscopeHierarchyEmpty {
-		errorstring += "BrandscopeHierarchy cannot be empty"
+		errorstring += EmptyBrandscopeHierarchy
 	}
 
-	err = StateValidation(data.State)
-	if err == errInvalidState {
-		errorstring += "Invalid State"
+	err = BrandNameValidation(data.BrandName)
+	if err == errBrandNameEmpty {
+		errorstring += EmptyBrandName
+	} else if err == errInvalidBrandName {
+		errorstring += InvalidBrandName
 	}
 
-	err = ProductSpecification1Validation(data.ProductSpecification1)
-	//fmt.Println(data.ProductSpecification1)
-	if err == errInvalidProductSpecification {
-		errorstring += "Invalid ProductSpecification1"
-	}
-	err = ProductSpecification2Validation(data.ProductSpecification2)
-	if err == errInvalidProductSpecification {
-		errorstring += "Invalid ProductSpecification2"
-	}
-	err = ProductSpecification3Validation(data.ProductSpecification3)
-	if err == errInvalidProductSpecification {
-		errorstring += "Invalid ProductSpecification3"
-	}
-	err = ProductSpecification4Validation(data.ProductSpecification4)
-	if err == errInvalidProductSpecification {
-		errorstring += "Invalid ProductSpecification4"
-	}
-	err = ProductSpecification5Validation(data.ProductSpecification5)
-	if err == errInvalidProductSpecification {
-		errorstring += "Invalid ProductSpecification5"
-	}
-	err = ProductSpecification6Validation(data.ProductSpecification6)
-	if err == errInvalidData {
-		errorstring += "ProductSpecification6 not valid"
-	} else {
-		count += 1
+	err = CatalogueOrderValidation(data.CatalogueOrder)
+	if err == errCatalogueOrderempty {
+		errorstring += CatalogueOrderEmpty
+	} else if err == errCatalogueOrderNotaNumber {
+		errorstring += CatalogueOrderNotANumber
 	}
 
-	err = ProductSpecification7Validation(data.ProductSpecification7)
-	if err == errInvalidData {
-		errorstring += "ProductSpecification7 not valid"
-	} else {
-		count += 1
+	err = CategoriesValidation(data.Categories)
+
+	if err == errInvalidCategories {
+		errorstring += InvalidCategories
 	}
 
-	err = ProductSpecification8Validation(data.ProductSpecification8)
-	if err == errInvalidData {
-		errorstring += "ProductSpecification8 not valid"
-	} else {
-		count += 1
+	err = CollectionsValidation(data.Collections)
+	if err == errInvalidCollections {
+		errorstring += InvalidCollections
 	}
 
-	err = ProductSpecification9Validation(data.ProductSpecification9)
-	if err == errInvalidData {
-		errorstring += "ProductSpecification9 not valid"
-	} else {
-		count += 1
+	err = CompanyNameValidation(data.CompanyName)
+	if err == errCompanyNameEmpty {
+		errorstring += EmptyCompanyName
+	} else if err == errInvalidCompanyName {
+		errorstring += InvalidCompanyName
 	}
 
-	err = ProductSpecification10Validation(data.ProductSpecification10)
-	if err == errInvalidData {
-		errorstring += "ProductSpecification10 not valid"
-	} else {
-		count += 1
+	err = DisplayRetailValidation(data.DisplayRetail)
+	if err == errDisplayRetailEmpty {
+		errorstring += EmptyDisplayRetail
 	}
 
-	err = ProductSpecification11Validation(data.ProductSpecification1)
-	//fmt.Println(data.ProductSpecification1)
-	if err == errInvalidProductSpecification {
-		errorstring += "Invalid ProductSpecification11"
-	}
-	err = ProductSpecification12Validation(data.ProductSpecification2)
-	if err == errInvalidProductSpecification {
-		errorstring += "Invalid ProductSpecification12"
-	}
-	err = ProductSpecification13Validation(data.ProductSpecification3)
-	if err == errInvalidProductSpecification {
-		errorstring += "Invalid ProductSpecification13"
-	}
-	err = ProductSpecification14Validation(data.ProductSpecification4)
-	if err == errInvalidProductSpecification {
-		errorstring += "Invalid ProductSpecification14"
-	}
-	err = ProductSpecification15Validation(data.ProductSpecification5)
-	if err == errInvalidProductSpecification {
-		errorstring += "Invalid ProductSpecification15"
+	err = DisplayWholesaleValidation(data.DisplayWholesale)
+	if err == errDisplayWholesaleEmpty {
+		errorstring += EmptyDisplayWholesale
 	}
 
-	err = ProductChanges1Validation(data.ProductChanges1)
-	if err == errInvalidProductChanges {
-		errorstring += "Invalid ProductChanges"
-	}
-	err = ProductChanges2Validation(data.ProductChanges2)
-	if err == errInvalidProductChanges {
-		errorstring += "Invalid ProductChanges"
-	}
-	err = ProductChanges3Validation(data.ProductChanges3)
-	if err == errInvalidProductChanges {
-		errorstring += "Invalid ProductChanges"
+	err = DisplayWholesaleRangeValidation(data.DisplayWholesaleRange)
+	if err == errDisplayWholesaleRangeNotValid {
+		errorstring += InvalidDisplayWholesaleRange
 	}
 
-	err = ProductChanges4Validation(data.ProductChanges2)
-	if err == errInvalidProductChanges {
-		errorstring += "Invalid ProductChanges"
-	}
-	err = ProductChanges5Validation(data.ProductChanges3)
-	if err == errInvalidProductChanges {
-		errorstring += "Invalid ProductChanges"
+	err = GenderValidations(data.Gender)
+	if err == errGender {
+
+		errorstring += data.Gender
+		errorstring += InvalidGender
 	}
 
-	err = AdditionalDetail1Validation(data.AdditionalDetail1)
-	if err == errInvalidAdditionalDetail {
-		errorstring += "Invalid AdditionalDetail"
-	}
-	err = AdditionalDetail2Validation(data.AdditionalDetail2)
-	if err == errInvalidAdditionalDetail {
-		errorstring += "Invalid AdditionalDetail"
+	err = GenericColorValidation(data.GenericColour)
+	if err == errInvalidGenericColour {
+		errorstring += InvalidGenericColour
 	}
 
-	err = AdditionalDetail3Validation(data.AdditionalDetail1)
-	if err == errInvalidAdditionalDetail {
-		errorstring += "Invalid AdditionalDetail"
-	}
-	err = AdditionalDetail4Validation(data.AdditionalDetail2)
-	if err == errInvalidAdditionalDetail {
-		errorstring += "Invalid AdditionalDetail"
-	}
-
-	err = AdditionalDetail5Validation(data.AdditionalDetail1)
-	if err == errInvalidAdditionalDetail {
-		errorstring += "Invalid AdditionalDetail"
-	}
-
-	err = SalesTipValidation(data.SalesTip)
-	if err == errInvalidSalesTip {
-		errorstring += "Invalid SalesTip"
+	err = Integration_IDValidations(data.Integration_ID, i)
+	if err == errIntegration_IDEmpty {
+		errorstring += EmptyIntegration_ID
+	} else if err == errIntIDAlreadyExists {
+		errorstring += Integration_IDAlreadyExists
+	} else if err == errInvalidIntegration_ID {
+		errorstring += InvalidIntegration_ID
 	}
 
 	err = MarketingSupportValidation(data.MarketingSupport)
 	if err == errInvalidMarketingSupport {
-		errorstring += "Invalid MarketingSupport"
+		errorstring += InvalidMarketingSupport
 	}
-	// err = errors.New(errorstring)
+
+	err = PackUnitsValidation(data.PackUnits)
+	if err == errPackUnitsEmpty {
+		errorstring += EmptyPackUnits
+	} else if err == errInvalidPackUnitsValue {
+		errorstring += InvalidPackUnits
+	}
+
+	err = ProductColourCodeValidation(data.ProductColourCode)
+	if err == errProductColourCodeNotValid {
+		errorstring += InvalidProductColourCode
+	}
+
+	err = ProductDisplayColourValidation(data.ProductDisplayColour)
+	if err == errProductDisplayColourNotValid {
+		errorstring += InvalidProductDisplayColour
+	}
+
+	err = ProductMultipleValidation(data.ProductMultiple)
+	if err == errInvalidProductMultiple {
+		errorstring += InvalidProductMultiple
+	}
+
+	err = ProductNameValidation(data.ProductName)
+	if err == errProductNameEmpty {
+		errorstring += EmptyProductName
+	}
+
+	err = RetailPriceOriginalValidation(data.RetailPriceOriginal, data.WholesalePrice)
+	if err == errRetailPriceOriginalEmpty {
+		errorstring += EmptyRetailPriceOriginal
+	} else if err == errInvalidRetailPriceOriginal {
+		errorstring += InvalidRetailPriceOriginal
+	}
+
+	err = RetailPriceValidation(data.RetailPrice, data.WholesalePrice)
+	if err == errRetailPriceEmpty {
+		errorstring += EmptyRetailPrice
+	} else if err == errInvalidRetailPriceValue {
+		errorstring += InvalidRetailPriceValue
+	}
+
+	err = SalesTipValidation(data.SalesTip)
+	if err == errInvalidSalesTip {
+		errorstring += InvalidSalesTip
+	}
+
+	err = SegmentNameValidation(data.SegmentNames)
+	if err == errInvalidSegmentNames {
+		errorstring += InvalidSegmentNames
+	}
+
+	err = SizeBreakValidation(data.SizeBreak)
+	if err == errInvalidSizeBreak {
+		errorstring += InvalidSizeBreak
+	}
+
+	err = SKUValidations(data.SKU, i)
+	if err == errSKUEmpty {
+		errorstring += EmptySKU
+	} else if err == errInvalidSKU {
+		errorstring += InvalidSKU
+	} else if err == errLength500 {
+		errorstring += InvalidSKUlength
+	}
+
+	err = WholesalePriceValidation(data.WholesalePrice)
+	if err == errWholesalePriceEmpty {
+		errorstring += EmptyWholesalePrice
+	} else if err == errInvalidWholesalePrice {
+		errorstring += InvalidWholesalePrice
+	}
+
+	err = WholesalePriceOriginalValidation(data.WholesalePriceOriginal)
+	if err == errWholesalePriceOriginalEmpty {
+		errorstring += EmptyWholesalePriceOriginal
+	} else if err == errInvalidWholesalePriceOriginal {
+		errorstring += InvalidWholesalePriceOriginal
+	}
+
+	err = StateValidation(data.State)
+	if err == errInvalidState {
+		errorstring += InvalidState
+	}
+
+	errstr := SpecificationValidation("1", data.ProductSpecification1)
+	if errstr == "1" {
+		errorstring += InvalidProductSpecification1
+	}
+	errstr = SpecificationValidation("2", data.ProductSpecification2)
+	if errstr == "2" {
+		errorstring += InvalidProductSpecification2
+	}
+	errstr = SpecificationValidation("3", data.ProductSpecification3)
+	if errstr == "3" {
+		errorstring += InvalidProductSpecification3
+	}
+	errstr = SpecificationValidation("4", data.ProductSpecification4)
+	if errstr == "4" {
+		errorstring += InvalidProductSpecification4
+	}
+	errstr = SpecificationValidation("5", data.ProductSpecification5)
+	if errstr == "5" {
+		errorstring += InvalidProductSpecification5
+	}
+	errstr = SpecificationValidation("6", data.ProductSpecification6)
+	if errstr == "6" {
+		errorstring += InvalidProductSpecification6
+	}
+
+	errstr = SpecificationValidation("7", data.ProductSpecification7)
+	if errstr == "7" {
+		errorstring += InvalidProductSpecification7
+	}
+	errstr = SpecificationValidation("8", data.ProductSpecification8)
+	if errstr == "8" {
+		errorstring += InvalidProductSpecification8
+	}
+
+	errstr = SpecificationValidation("9", data.ProductSpecification9)
+	if errstr == "9" {
+		errorstring += InvalidProductSpecification9
+	}
+	errstr = SpecificationValidation("10", data.ProductSpecification4)
+	if errstr == "10" {
+		errorstring += InvalidProductSpecification10
+	}
+
+	errstr = SpecificationValidation("1", data.ProductChanges1)
+	if errstr == "1" {
+		errorstring += InvalidProductChanges1
+	}
+	errstr = SpecificationValidation("2", data.ProductChanges2)
+	if errstr == "2" {
+		errorstring += InvalidProductChanges2
+	}
+
+	errstr = SpecificationValidation("3", data.ProductChanges3)
+	if errstr == "3" {
+		errorstring += InvalidProductChanges3
+	}
+
+	errstr = SpecificationValidation("4", data.ProductChanges4)
+	if errstr == "4" {
+		errorstring += InvalidProductChanges4
+	}
+	errstr = SpecificationValidation("5", data.ProductChanges5)
+	if errstr == "5" {
+		errorstring += InvalidProductChanges5
+	}
+
+	errstr = SpecificationValidation("1", data.AdditionalDetail1)
+	if errstr == "1" {
+		errorstring += InvalidAdditionalDetail1
+	}
+	errstr = SpecificationValidation("2", data.AdditionalDetail2)
+	if errstr == "2" {
+		errorstring += InvalidAdditionalDetail2
+	}
+
+	errstr = SpecificationValidation("3", data.AdditionalDetail3)
+	if errstr == "3" {
+		errorstring += InvalidAdditionalDetail3
+	}
+	errstr = SpecificationValidation("4", data.AdditionalDetail4)
+	if errstr == "4" {
+		errorstring += InvalidAdditionalDetail4
+	}
+
+	errstr = SpecificationValidation("5", data.AdditionalDetail5)
+	if errstr == "5" {
+		errorstring += InvalidAdditionalDetail5
+	}
+
 	if errorstring == "" {
 		errorstring = "ok"
 	}
 
 	return errorstring, nil
-	// fmt.Println(errorstring)
 
 }
-
-//function to match values from csv with DB
-
-// func matchValues(s string, s1 string, s2 string, s3 string) (err error) {
-// 	for _, d := range data1 {
-// 		if (d.Integration_ID == s) && (d.SKU == s1) && (d.Size == s2) && (d.Colour_code == s3) {
-// 			return errEntryFound
-// 		}
-// 	}
-// 	return nil
-//
-// }
 
 func NewService(s db.Storer, l *zap.SugaredLogger) Service {
 	return &CsvService{
