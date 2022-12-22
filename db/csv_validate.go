@@ -54,7 +54,10 @@ func (s *store) FindLogID(ctx context.Context, log_id string) (row LogID, err er
 
 	err = WithDefaultTimeout(ctx, func(ctx context.Context) error {
 		rows, err := s.db.QueryContext(ctx, findbyLogID, log_id)
-		ReturnError(err)
+		if err == sql.ErrNoRows {
+			return ErrEmptyData
+		}
+		// ReturnError(err)
 		for rows.Next() {
 			err = rows.Scan(
 				&row.Original_file_location, &row.ReleaseID, &row.BrandID,

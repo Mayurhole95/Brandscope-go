@@ -6,6 +6,7 @@ import (
 
 	"github.com/Mayurhole95/Brandscope-go/app"
 	"github.com/Mayurhole95/Brandscope-go/config"
+	csv_upload "github.com/Mayurhole95/Brandscope-go/csv_upload"
 	csv_validate "github.com/Mayurhole95/Brandscope-go/csv_validate"
 	"github.com/Mayurhole95/Brandscope-go/db"
 	"github.com/urfave/cli"
@@ -23,6 +24,8 @@ func main() {
 	cliApp.Name = "Golang App"
 	cliApp.Version = "1.0.0"
 	cliApp.Commands = []cli.Command{
+		//If again want to convert to api , we need the below part to start server
+
 		// {
 		// 	Name:  "start",
 		// 	Usage: "start server",
@@ -35,34 +38,25 @@ func main() {
 			Name:  "validate",
 			Usage: "run validations code",
 			Action: func(c *cli.Context) error {
-				// fmt.Println("Hii")
+				// Run Validate
 				csv := csv_validate.NewService(dbstorer, logger)
 
 				csv.Validate(context.TODO(), c.Args().Get(0))
 				return nil
 			},
 		},
+		{
+			Name:  "upload",
+			Usage: "run upload code",
+			Action: func(c *cli.Context) error {
+				// Run Validate as well as upload
+				csv := csv_validate.NewService(dbstorer, logger)
 
-		{
-			Name:  "create_migration",
-			Usage: "create migration file",
-			Action: func(c *cli.Context) error {
-				return db.CreateMigrationFile(c.Args().Get(0))
-			},
-		},
-		{
-			Name:  "migrate",
-			Usage: "run db migrations",
-			Action: func(c *cli.Context) error {
-				err := db.RunMigrations()
-				return err
-			},
-		},
-		{
-			Name:  "rollback",
-			Usage: "rollback migrations",
-			Action: func(c *cli.Context) error {
-				return db.RollbackMigrations(c.Args().Get(0))
+				csv.Validate(context.TODO(), c.Args().Get(0))
+				csv1 := csv_upload.NewService(dbstorer, logger)
+
+				csv1.Upload(context.TODO(), c.Args().Get(0))
+				return nil
 			},
 		},
 	}

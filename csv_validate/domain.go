@@ -1,5 +1,11 @@
 package csv_validate
 
+import (
+	"context"
+
+	"github.com/Mayurhole95/Brandscope-go/db"
+)
+
 type BrandHeader struct {
 	AttributeValue         string `csv:"AttributeValue"`
 	AttributeType          string `csv:"AttributeType"`
@@ -71,6 +77,20 @@ type BrandHeader struct {
 	AdditionalDetail5      string `csv:"AdditionalDetail5"`
 }
 
+var LogData db.LogID
+var dbMonths []string
+var file_name_errors string = "Dash_Summer 21_20221201121220_errors.csv"
+
+type Service interface {
+	Validate(ctx context.Context, id string) (successmessage string, err error)
+}
+
+var CSVData = []BrandHeader{}
+
+type CsvSerive_validate struct {
+	store db.Storer
+}
+
 type Verify struct {
 	Size        string `db:"size"`
 	SKU         string `db:"sku"`
@@ -87,15 +107,8 @@ type Success struct {
 	Filepath string `json:"Filepath"`
 }
 
-type File_Validation struct {
-	File      string `csv:"file"`
-	BrandID   string `text:"brand_id"`
-	ReleaseID string `text:"release_id"`
-	Format    string `text:"format"`
-}
-
 type LogID struct {
 	Original_file_location string `db:"original_file_location"`
-	ReleaseID              string `db:"release_id`
+	ReleaseID              string `db:"release_id"`
 	BrandID                string `db:"brand_id"`
 }

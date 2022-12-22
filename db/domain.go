@@ -15,6 +15,6 @@ type Verify struct {
 
 type LogID struct {
 	Original_file_location string `db:"original_file_location"`
-	ReleaseID              string `db:"release_id`
+	ReleaseID              string `db:"release_id"`
 	BrandID                string `db:"brand_id"`
 }

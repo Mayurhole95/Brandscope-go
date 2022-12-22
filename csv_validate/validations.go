@@ -46,7 +46,7 @@ func AttributeValueValidation(s string) (err error) {
 }
 
 func ChangeDateFormat(delivery_month []string) (months []string, err error) {
-	for i := 0; i < len(delivery_month); i++ {
+	for i := range Iterate(len(delivery_month)) {
 		date, err := time.Parse("2006-01-02", delivery_month[i])
 		ReturnError(err)
 		year, month, _ := date.Date()
@@ -180,8 +180,8 @@ func Integration_IDValidations(s string, i int) (err error) {
 	// fmt.Println(csvData)
 	// fmt.Println(s, "Hii")
 
-	for j := 1; j < i; j++ {
-		if s == csvData[j].Integration_ID {
+	for j := range Iterate(i) {
+		if s == CSVData[j].Integration_ID {
 			// fmt.Println("Int id exists")
 			return errIntIDExists
 		}
@@ -314,8 +314,8 @@ func SKUValidations(s string, i int) (err error) {
 	if len(s) > 500 {
 		return errLength500
 	}
-	for j := 1; j < i; j++ {
-		if s == csvData[j].SKU {
+	for j := range Iterate(i) {
+		if s == CSVData[j].SKU {
 			// fmt.Println("SKU exists")
 			return errSKUExists
 		}
@@ -332,11 +332,11 @@ func StateValidation(s string) (err error) {
 
 func UniqueProductValidations(s string, i int) (err error) {
 
-	for j := 1; j < i; j++ {
-		if strings.EqualFold(strings.ToLower(s), strings.ToLower(csvData[j].SKU+csvData[j].ProductColourCode+csvData[j].SizeBreak)) {
+	for j := range Iterate(i) {
+		if strings.EqualFold(strings.ToLower(s), strings.ToLower(CSVData[j].SKU+CSVData[j].ProductColourCode+CSVData[j].SizeBreak)) {
 			// fmt.Println("Similar product exists")
 			return errProductExists
-		} else if csvData[i].CompanyName == csvData[j].CompanyName {
+		} else if CSVData[i].CompanyName == CSVData[j].CompanyName {
 			return errCompanyDoesNotExist
 		}
 

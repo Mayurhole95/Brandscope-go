@@ -13,44 +13,37 @@ import (
 	"go.uber.org/zap"
 )
 
-type Service interface {
-	Validate(ctx context.Context, id string) (successmessage string, err error)
-}
-
-var csvData = []BrandHeader{}
-
-type CsvService struct {
-	store db.Storer
-}
-
 func NewService(s db.Storer, l *zap.SugaredLogger) Service {
-	return &CsvService{
+	return &CsvSerive_validate{
 		store: s,
 	}
 }
 
-var logdata db.LogID
-var dbMonths []string
-var file_name_errors string = "Dash_Summer 21_20221201121220_errors.csv"
-
-func (cs *CsvService) Validate(ctx context.Context, id string) (successmessage string, err error) {
-	logdata, err = cs.store.FindLogID(ctx, id)
+func (cs *CsvSerive_validate) Validate(ctx context.Context, id string) (successmessage string, err error) {
+	LogData, err = cs.store.FindLogID(ctx, id)
+	if err == ErrEmptyData {
+		fmt.Println("empty")
+		return
+	}
 	var success Success
 	// var successmessage string
 	ReturnError(err)
-	// fmt.Println(logdata)
+	// fmt.Println(LogData)
 
-	exist, err := cs.store.FindID(ctx, logdata.BrandID, logdata.ReleaseID)
+	Exist, err := cs.store.FindID(ctx, LogData.BrandID, LogData.ReleaseID)
 	ReturnError(err)
 
-	if exist {
+	if Exist {
 		missingheader, err := HeaderCheck()
 		if err != nil {
 			csvFile, err := os.Create(file_name_errors)
 			ReturnError(err)
 			csvwriter := csv.NewWriter(csvFile)
-			for i := 0; i < len(missingheader); i++ {
-				_ = csvwriter.Write(missingheader[i])
+			// for i := 0; i < len(missingheader); i++ {
+			// 	_ = csvwriter.Write(missingheader[i])
+			// }
+			for _, j := range missingheader {
+				_ = csvwriter.Write(j)
 			}
 			csvwriter.Flush()
 			csvFile.Close()
@@ -61,9 +54,9 @@ func (cs *CsvService) Validate(ctx context.Context, id string) (successmessage s
 			return successmessage, errNoData
 		}
 		success = SuccessMessage(true, errHeadersFound, "No error")
-		csvDataMap, err := cs.store.ListData(logdata.BrandID)
+		csvDataMap, err := cs.store.ListData(LogData.BrandID)
 		ReturnError(err)
-		months, err := cs.store.ListMonths(logdata.ReleaseID)
+		months, err := cs.store.ListMonths(LogData.ReleaseID)
 		dbMonths, err = ChangeDateFormat(months)
 		// fmt.Println(dbMonths)
 		ReturnError(err)
@@ -132,7 +125,7 @@ func HeaderCheck() (missingheader [][]string, err error) {
 	headers := [23]string{"CatalogueOrder", "BrandscopeCarryOver", "Integration_ID", "Barcode", "SKU", "ProductName", "ProductColourCode", "ProductDisplayColour", "GenericColour", "SizeBreak", "AttributeValue", "AttributeType", "AttributeSequence", "DisplayWholesaleRange", "DisplayWholesale", "DisplayRetail", "PackUnits", "AvailableMonths", "AgeGroup", "Gender", "State", "PreOrderLeadTimeDays", "PreOrderMessage"}
 	missingheaders := make([]string, 0)
 	missingheaders2d := make([][]string, 0)
-	readCsvFile, err := os.Open(logdata.Original_file_location)
+	readCsvFile, err := os.Open(LogData.Original_file_location)
 	ReturnError(err)
 	defer readCsvFile.Close()
 
@@ -142,9 +135,9 @@ func HeaderCheck() (missingheader [][]string, err error) {
 	ReturnError(err)
 	lenarr := len(records)
 	count := 0
-	for column_headers := 0; column_headers < len(headers); column_headers++ {
+	for column_headers := range Iterate(len(headers)) {
 		header_present := "false"
-		for column_csv := 0; column_csv < lenarr; column_csv++ {
+		for column_csv := range Iterate(lenarr) {
 			if headers[column_headers] == records[column_csv] {
 				map_headers[headers[column_headers]] = column_csv
 				header_present = "true"
@@ -153,6 +146,7 @@ func HeaderCheck() (missingheader [][]string, err error) {
 			}
 
 		}
+
 		if header_present == "false" {
 			missingheaders = append(missingheaders, headers[column_headers])
 			missingheaders2d = append(missingheaders2d, [][]string{missingheaders}...)
@@ -171,8 +165,8 @@ func HeaderCheck() (missingheader [][]string, err error) {
 
 func readCSVData(dbData map[string]db.Verify) (errorMessage string, err error) {
 	// var CsvData = []BrandHeader{}
-	err = csvtag.LoadFromPath(logdata.Original_file_location,
-		&csvData,
+	err = csvtag.LoadFromPath(LogData.Original_file_location,
+		&CSVData,
 		csvtag.CsvOptions{ // Load your csv with optional options
 			Separator: ',', // changes the values separator, default to ','
 		})
@@ -180,7 +174,7 @@ func readCSVData(dbData map[string]db.Verify) (errorMessage string, err error) {
 		return "", err
 	}
 	var file [][]string
-	readCsvFile, err := os.Open(logdata.Original_file_location)
+	readCsvFile, err := os.Open(LogData.Original_file_location)
 	ReturnError(err)
 
 	// remember to close the file at the end of the program
@@ -196,24 +190,24 @@ func readCSVData(dbData map[string]db.Verify) (errorMessage string, err error) {
 	count := 0
 	verifiedFields := make(map[string]bool)
 
-	for i := 0; i < len(csvData); i++ {
+	for i, j := range CSVData {
 		count = 0
 		str = ""
-		if _, find := verifiedFields[csvData[i].Integration_ID]; find {
+		if _, find := verifiedFields[j.Integration_ID]; find {
 			str = errCarryOverNot
 			count = 1
 		}
 		if count == 1 {
 			continue
 		}
-		if _, ok := dbData[csvData[i].Integration_ID]; ok {
-			if csvData[i].BrandscopeCarryOver == "N" || csvData[i].BrandscopeCarryOver == "n" {
+		if _, ok := dbData[j.Integration_ID]; ok {
+			if j.BrandscopeCarryOver == "N" || j.BrandscopeCarryOver == "n" {
 				str = errCarryOverNot
 				errorMessage += str
 				file[i] = append(file[i], str)
 				count = 1
 			} else {
-				if dbData[csvData[i].Integration_ID].SKU != csvData[i].SKU || dbData[csvData[i].Integration_ID].Colour_code != csvData[i].ProductColourCode || dbData[csvData[i].Integration_ID].Size != csvData[i].SizeBreak {
+				if dbData[j.Integration_ID].SKU != j.SKU || dbData[j.Integration_ID].Colour_code != j.ProductColourCode || dbData[j.Integration_ID].Size != j.SizeBreak {
 					str = errCarryOverYes
 					errorMessage += str
 					file[i] = append(file[i], str)
@@ -222,7 +216,7 @@ func readCSVData(dbData map[string]db.Verify) (errorMessage string, err error) {
 
 			}
 		} else {
-			if csvData[i].BrandscopeCarryOver == "Y" || csvData[i].BrandscopeCarryOver == "y" {
+			if j.BrandscopeCarryOver == "Y" || j.BrandscopeCarryOver == "y" {
 				str = errCarryOverYes
 				errorMessage += str
 				file[i] = append(file[i], str)
@@ -233,10 +227,10 @@ func readCSVData(dbData map[string]db.Verify) (errorMessage string, err error) {
 			continue
 		}
 
-		str, err = CheckValidations(csvData[i], i)
+		str, err = CheckValidations(j, i)
 
 		if str == perfectEntry {
-			verifiedFields[csvData[i].Integration_ID] = true
+			verifiedFields[j.Integration_ID] = true
 		}
 		file[i] = append(file[i], str)
 		if str != "" {
@@ -249,11 +243,14 @@ func readCSVData(dbData map[string]db.Verify) (errorMessage string, err error) {
 	ReturnError(err)
 	csvwriter := csv.NewWriter(csvFile)
 
-	for i := 0; i < len(file); i++ {
+	for i := range Iterate(len(file)) {
 
 		_ = csvwriter.Write(file[i])
 	}
 	csvwriter.Flush()
 	csvFile.Close()
 	return errorMessage, nil
+}
+func Iterate(n int) []struct{} {
+	return make([]struct{}, n)
 }

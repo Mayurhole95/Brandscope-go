@@ -1,0 +1,22 @@
+CatalogueOrder,BrandscopeCarryOver,Integration_ID,Barcode,SKU,ProductName,ProductColourCode,ProductDisplayColour,GenericColour,SizeBreak,AttributeValue,AttributeType,DisplayWholesale,DisplayWholesaleRange,WholesalePriceOriginal,WholesalePrice,DisplayRetail,RetailPriceOriginal,RetailPrice,PackUnits,ProductMultiple,AvailableMonths,Divisions,Collections,Categories,DiscountCategory,ProductTags,AgeGroup,Gender,BrandscopeHierarchy,State,ProductRequirement1,ProductSpecification1,ProductSpecification2,ProductSpecification3,ProductSpecification4,ProductSpecification5,ProductSpecification6,ProductSpecification7,ProductSpecification8,ProductSpecification9,ProductSpecification10,ProductSpecification11,ProductSpecification12,ProductSpecification13,ProductSpecification14,ProductSpecification15,ProductChanges1,ProductChanges2,ProductChanges3,ProductChanges4,ProductChanges5,AdditionalDetail1,AdditionalDetail2,AdditionalDetail3,AdditionalDetail4,AdditionalDetail5,SalesTip,MarketingSupport,CompanyName,BrandName,ReleaseName,SegmentNames,AtsInIndent,AtsInInseason,PreOrderLeadTimeDays,PreOrderMessage,AttributeSequence
+10,Y,xyz10	,1000010	,A2334455,Scuba Pro,BLA,Black,Black,O/S,,,44.5,44.5,44.5,44.5,84.99,84.99,84.99,1,2,"MAY21,JUN21",Scuba,Deep Sea,Masks,,,Adult,Unisex,Unassigned,Active,ORDER REQUIREMENT: Min 2,"UnknownHydroSkinFlexTecnology 
+","Unknown Adjustable Size 
+",,,,,,,,,,,,,,,,,,,,,,,,,,Just Ash,Dash,Summer 21,"Tier 1,Tier 2,Tier 3",N,Y,,,
+10,Y,xyz11	,1000011	,A2334456	,Scuba Pro,YEL,Yellow,Yellow,O/S,,,44.5,44.5,44.5,44.5,84.99,84.99,84.99,1,2,"MAY21,JUN21",Scuba,Deep Sea,Masks,,,Adult,Unisex,Unassigned,Active,ORDER REQUIREMENT: Min 2,"UnknownHydroSkinFlexTecnology 
+","Unknown Adjustable Size 
+",,,,,,,,,,,,,,,,,,,,,,,,,,Just Ash,Dash,Summer 21,"Tier 1,Tier 2,Tier 3",N,Y,,,
+10,N,xyz12	,1000012	,A2334457	,Scuba Pro,WHI,White,White,O/S,,,44.5,44.5,44.5,44.5,84.99,84.99,84.99,1,2,"MAY21,JUN21",Scuba,Deep Sea,Masks,,,Adult,Unisex,Unassigned,Active,ORDER REQUIREMENT: Min 2,"UnknownHydroSkinFlexTecnology 
+","Unknown Adjustable Size 
+",,,,,,,,,,,,,,,,,,,,,,,,,,Just Ash,Dash,Summer 21,"Tier 1,Tier 2,Tier 3",N,Y,,,
+10,N,hxshxh	,5464747	,A7585858	,Scuba Pro,BLA,Black,Black,O/S,,,44.5,44.5,44.5,44.5,84.99,84.99,84.99,1,2,"MAY21,JUN21",Scuba,Deep Sea,Masks,,,Adult,Unisex,Unassigned,Active,ORDER REQUIREMENT: Min 3,"UnknownHydroSkinFlexTecnology 
+","Unknown Adjustable Size 
+",,,,,,,,,,,,,,,,,,,,,,,,,,Just Ash,Dash,Summer 21,,N,Y,,,
+10,N,nbddsddn	,5463992,A757484	,Scuba Pro,RED,Red,Red,O/S,,,44.5,44.5,44.5,44.5,84.99,84.99,84.99,1,2,"MAY21,JUN21",Scuba,Deep Sea,Masks,,,Adult,Unisex,Unassigned,Active,ORDER REQUIREMENT: Min 4,"UnknownHydroSkinFlexTecnology 
+","Unknown Adjustable Size 
+",,,,,,,,,,,,,,,,,,,,,,,,,,Just Ash,Dash,Summer 21,"Tier 1,Tier 2,Tier 3",N,Y,,,
+10,N,fdsffefew	,7738838	,A757484 ,Scuba Pro,RED,Red,Red,O/S,,,44.5,44.5,44.5,44.5,84.99,84.99,84.99,1,2,"MAY21,JUN21",Scuba,Deep Sea,Masks,,,Adult,Unisex,Unassigned,Active,ORDER REQUIREMENT: Min 5,"UnknownHydroSkinFlexTecnology 
+","Unknown Adjustable Size 
+",,,,,,,,,,,,,,,,,,,,,,,,,,Just Ash,Dash,Summer 21,,N,Y,,,
+10,N,fdsffefey	,7738849	,A367374	,Scuba Pro,RED,Red,Red,O/S,,,44.5,44.5,44.5,44.5,84.99,84.99,84.99,1,2,"MAY21,JUN21",Scuba,Deep Sea,Masks,,,Adult,Unisex,Unassigned,Active,ORDER REQUIREMENT: Min 5,"UnknownHydroSkinFlexTecnology 
+","Unknown Adjustable Size 
+",,,,,,,,,,,,,,,,,,,,,,,,,,Just Ash,Dash,Summer 21,,N,Y,,,
