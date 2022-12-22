@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/Mayurhole95/Brandscope-go/config"
 	"github.com/jmoiron/sqlx"
-	"github.com/joshsoftware/golang-boilerplate/config"
 	"go.uber.org/zap"
 )
 
@@ -34,11 +34,8 @@ func InitLogger() {
 
 func initDB() (err error) {
 	dbConfig := config.Database()
-
-	fmt.Printf("%+v", dbConfig)
-	fmt.Printf("Driver : ", dbConfig.Driver())
-	fmt.Printf("Conn URL", dbConfig.ConnectionURL())
 	db, err = sqlx.Open(dbConfig.Driver(), dbConfig.ConnectionURL())
+
 	if err != nil {
 		fmt.Println("Error : ", err.Error())
 		return

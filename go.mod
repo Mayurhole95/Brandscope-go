@@ -1,22 +1,23 @@
-module github.com/joshsoftware/golang-boilerplate
+module github.com/Mayurhole95/Brandscope-go
 
 go 1.17
 
 require (
-	github.com/gorilla/mux v1.7.0
+	// github.com/gorilla/mux v1.7.0
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/lib/pq v1.10.7
 	github.com/mattes/migrate v3.0.1+incompatible
 	github.com/pkg/errors v0.8.1
 	github.com/spf13/viper v1.3.1
 	github.com/urfave/cli v1.20.0
-	github.com/urfave/negroni v1.0.0
+	// github.com/urfave/negroni v1.0.0
 	go.uber.org/zap v1.9.1
 )
 
 require (
 	github.com/BurntSushi/toml v1.1.0 // indirect
 	github.com/Microsoft/go-winio v0.5.2 // indirect
+	github.com/artonge/go-csv-tag/v2 v2.1.0
 	github.com/docker/distribution v2.8.1+incompatible // indirect
 	github.com/docker/docker v20.10.16+incompatible // indirect
 	github.com/docker/go-connections v0.4.0 // indirect
