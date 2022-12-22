@@ -1,40 +1,48 @@
-package csv
+package csv_validate
 
 type BrandHeader struct {
-	CatalogueOrder         string `csv:"CatalogueOrder"`
-	Integration_ID         string `csv:"Integration_ID"`
-	BrandscopeCarryOver    string `csv:"BrandscopeCarryOver"`
-	Barcode                string `csv:"Barcode"`
-	SKU                    string `csv:"SKU"`
-	ProductName            string `csv:"ProductName"`
-	ProductColourCode      string `csv:"ProductColourCode"`
-	ProductDisplayColour   string `csv:"ProductDisplayColour"`
-	GenericColour          string `csv:"GenericColour"`
-	SizeBreak              string `csv:"SizeBreak"`
 	AttributeValue         string `csv:"AttributeValue"`
 	AttributeType          string `csv:"AttributeType"`
 	AttributeSequence      string `csv:"AttributeSequence"`
-	DisplayWholesaleRange  string `csv:"DisplayWholesaleRange"`
-	PreOrderLeadTimeDays   string `csv:"PreOrderLeadTimeDays"`
-	PreOrderMessage        string `csv:"PreOrderMessage"`
-	DisplayWholesale       string `csv:"DisplayWholesale"`
-	DisplayRetail          string `csv:"DisplayRetail"`
-	PackUnits              string `csv:"PackUnits"`
 	AvailableMonths        string `csv:"AvailableMonths"`
+	AtsInIndent            string `csv:"AtsInIndent"`
+	AtsInInSeason          string `csv:"AtsInInSeason"`
 	AgeGroup               string `csv:"AgeGroup"`
-	Gender                 string `csv:"Gender"`
-	State                  string `csv:"State"`
-	WholesalePriceOriginal string `csv:"WholesalePriceOriginal"`
-	WholesalePrice         string `csv:"WholesalePrice"`
-	RetailPriceOriginal    string `csv:"RetailPriceOriginal"`
-	RetailPrice            string `csv:"RetailPrice"`
-	ProductMultiple        string `csv:"ProductMultiple"`
-	Divisions              string `csv:"Divisions"`
+	BrandscopeHierarchy    string `csv:"BrandscopeHierarchy"`
+	BrandscopeCarryOver    string `csv:"BrandscopeCarryOver"`
+	BrandName              string `csv:"BrandName"`
+	Barcode                string `csv:"Barcode"`
+	CompanyName            string `csv:"CompanyName"`
 	Collections            string `csv:"Collections"`
 	Categories             string `csv:"Categories"`
+	CatalogueOrder         string `csv:"CatalogueOrder"`
+	DisplayWholesaleRange  string `csv:"DisplayWholesaleRange"`
+	Divisions              string `csv:"Divisions"`
 	DiscountCategory       string `csv:"DiscountCategory"`
+	DisplayWholesale       string `csv:"DisplayWholesale"`
+	DisplayRetail          string `csv:"DisplayRetail"`
+	GenericColour          string `csv:"GenericColour"`
+	Gender                 string `csv:"Gender"`
+	Integration_ID         string `csv:"Integration_ID"`
+	MarketingSupport       string `csv:"MarketingSupport"`
+	PreOrderLeadTimeDays   string `csv:"PreOrderLeadTimeDays"`
+	PreOrderMessage        string `csv:"PreOrderMessage"`
+	ProductMultiple        string `csv:"ProductMultiple"`
 	ProductTags            string `csv:"ProductTags"`
-	BrandscopeHierarchy    string `csv:"BrandscopeHierarchy"`
+	ProductName            string `csv:"ProductName"`
+	ProductColourCode      string `csv:"ProductColourCode"`
+	ProductDisplayColour   string `csv:"ProductDisplayColour"`
+	PackUnits              string `csv:"PackUnits"`
+	RetailPriceOriginal    string `csv:"RetailPriceOriginal"`
+	RetailPrice            string `csv:"RetailPrice"`
+	ReleaseName            string `csv:"ReleaseName"`
+	SegmentNames           string `csv:"SegmentNames"`
+	SalesTip               string `csv:"SalesTip"`
+	SizeBreak              string `csv:"SizeBreak"`
+	State                  string `csv:"State"`
+	SKU                    string `csv:"SKU"`
+	WholesalePriceOriginal string `csv:"WholesalePriceOriginal"`
+	WholesalePrice         string `csv:"WholesalePrice"`
 	ProductRequirement1    string `csv:"ProductRequirement1"`
 	ProductSpecification1  string `csv:"ProductSpecification1"`
 	ProductSpecification2  string `csv:"ProductSpecification2"`
@@ -61,22 +69,7 @@ type BrandHeader struct {
 	AdditionalDetail3      string `csv:"AdditionalDetail3"`
 	AdditionalDetail4      string `csv:"AdditionalDetail4"`
 	AdditionalDetail5      string `csv:"AdditionalDetail5"`
-	BrandName              string `csv:"BrandName"`
-	ReleaseName            string `csv:"ReleaseName"`
-	SegmentNames           string `csv:"SegmentNames"`
-	AtsInIndent            string `csv:"AtsInIndent"`
-	AtsInInSeason          string `csv:"AtsInInSeason"`
-	SalesTip               string `csv:"SalesTip"`
-	MarketingSupport       string `csv:"MarketingSupport"`
-	CompanyName            string `csv:"CompanyName"`
 }
-
-// type Entries struct {
-// 	Integration_ID string `db:"Integration_id"`
-// 	Size           string `db:"size"`
-// 	SKU            string `db:"sku"`
-// 	Colour_code    string `db:"colour_code"`
-// }
 
 type Verify struct {
 	Size        string `db:"size"`
@@ -101,6 +94,8 @@ type File_Validation struct {
 	Format    string `text:"format"`
 }
 
-// type listTables struct {
-// 	Shows []int64 `json:"tables"`
-// }
+type LogID struct {
+	Original_file_location string `db:"original_file_location"`
+	ReleaseID              string `db:"release_id`
+	BrandID                string `db:"brand_id"`
+}

@@ -34,11 +34,8 @@ func InitLogger() {
 
 func initDB() (err error) {
 	dbConfig := config.Database()
-
-	fmt.Printf("%+v", dbConfig)
-	fmt.Printf("Driver : ", dbConfig.Driver())
-	fmt.Printf("Conn URL", dbConfig.ConnectionURL())
 	db, err = sqlx.Open(dbConfig.Driver(), dbConfig.ConnectionURL())
+
 	if err != nil {
 		fmt.Println("Error : ", err.Error())
 		return
