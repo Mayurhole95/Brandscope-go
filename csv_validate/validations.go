@@ -94,6 +94,9 @@ func BrandNameValidation(s string) (err error) {
 	if isAlphaNumeric(s) != nil {
 		return errInvalidData
 	}
+	if !strings.EqualFold(strings.ToLower(s), strings.ToLower(brandName)) {
+		return errBrandNotFound
+	}
 	return nil
 }
 
@@ -268,7 +271,18 @@ func ProductNameValidation(s string) (err error) {
 	}
 	return nil
 }
-
+func ReleaseNameValidation(s string) (err error) {
+	if s == "" {
+		return errReleaseNameEmpty
+	}
+	if isAlphaNumeric(s) != nil {
+		return errInvalidData
+	}
+	if !strings.EqualFold(strings.ToLower(s), strings.ToLower(releaseName)) {
+		return errReleaseNotFound
+	}
+	return nil
+}
 func RetailPriceValidation(s string, s1 string) (err error) {
 	if s == "" {
 		return errRetailPriceEmpty

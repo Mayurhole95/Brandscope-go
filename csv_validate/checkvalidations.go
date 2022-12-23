@@ -62,6 +62,8 @@ func CheckValidations(data BrandHeader, i int) (errorstring string, err error) {
 		errorstring += "BrandName==> BrandName can't be empty"
 	} else if err == errInvalidData {
 		errorstring += "BrandName==> BrandName not valid"
+	} else if err == errBrandNotFound {
+		errorstring += "BrandName==> BrandName not found"
 	}
 
 	err = CatalogueOrderValidation(data.CatalogueOrder)
@@ -152,6 +154,15 @@ func CheckValidations(data BrandHeader, i int) (errorstring string, err error) {
 	err = ProductNameValidation(data.ProductName)
 	if err == errProductNameEmpty {
 		errorstring += "ProductName==> ProductName cannot be empty, "
+	}
+
+	err = ReleaseNameValidation(data.ReleaseName)
+	if err == errReleaseNameEmpty {
+		errorstring += "ReleaseName==> ReleaseName can't be empty"
+	} else if err == errInvalidData {
+		errorstring += "ReleaseName==> ReleaseName not valid"
+	} else if err == errReleaseNotFound {
+		errorstring += "ReleaseName==> ReleaseName not found"
 	}
 
 	err = RetailPriceOriginalValidation(data.RetailPriceOriginal, data.WholesalePrice)

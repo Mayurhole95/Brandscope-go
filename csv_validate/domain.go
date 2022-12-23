@@ -114,8 +114,6 @@ func (b *BrandHeader) ToArray() []string {
 		b.Gender,
 		b.BrandscopeHierarchy,
 		b.State,
-		b.PreOrderLeadTimeDays,
-		b.PreOrderMessage,
 		b.ProductRequirement1,
 		b.ProductSpecification1,
 		b.ProductSpecification2,
@@ -150,6 +148,8 @@ func (b *BrandHeader) ToArray() []string {
 		b.SegmentNames,
 		b.AtsInIndent,
 		b.AtsInInSeason,
+		b.PreOrderLeadTimeDays,
+		b.PreOrderMessage,
 	}
 }
 
@@ -191,6 +191,8 @@ type Service interface {
 }
 
 var csvData = []BrandHeader{}
+
+var brandName, releaseName string
 
 func readHeaders() []string {
 	readCsvFile, err := os.Open(logdata.Original_file_location)

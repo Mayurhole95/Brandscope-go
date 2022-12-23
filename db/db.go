@@ -18,6 +18,8 @@ const (
 
 type Storer interface {
 	ListData(brand_id string) (data map[string]Verify, err error)
+	FindBrandName(brand_id string) (brand_name string, err error)
+	FindReleaseName(release_id string) (release_name string, err error)
 	FindLogID(ctx context.Context, log_id string) (row LogID, err error)
 	FindID(ctx context.Context, brand_id string, release_id string) (exists bool, err error)
 	ListMonths(release_id string) (months []string, err error)

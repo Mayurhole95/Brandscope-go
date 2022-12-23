@@ -12,11 +12,14 @@ var (
 	errInvalidProductSpecification           = errors.New("ProductSpecification Invalid")
 	errInvalidProductChanges                 = errors.New("ProductChanges Invalid")
 	errInvalidAdditionalDetail               = errors.New("AdditionalDetail Invalid")
+	errBrandNotFound                         = errors.New("Brand Not found")
+	errBrandIDExists                         = "Brand id doesn't exist"
+	errCarryOverNot                          = "This product is NOT flagged as a carry-over product, but there is already a product with the SKU/Colour/Size combination."
+	errCarryOverYes                          = "This product is flagged as a carry-over product, but there is not a product with the SKU/Colour/Size combination."
+	perfectEntry                             = "ok"
 
-	errBrandIDExists = "Brand id doesn't exist"
-	errCarryOverNot  = "This product is NOT flagged as a carry-over product, but there is already a product with the SKU/Colour/Size combination."
-	errCarryOverYes  = "This product is flagged as a carry-over product, but there is not a product with the SKU/Colour/Size combination."
-	perfectEntry     = "ok"
+	errReleaseNameEmpty = errors.New("Release name empty")
+	errReleaseNotFound  = errors.New("Release name not found")
 
 	InvalidProductSpecification1  = "ProductSpecification1 contains Illegal characters"
 	InvalidProductSpecification2  = "ProductSpecification2 contains Illegal characters"

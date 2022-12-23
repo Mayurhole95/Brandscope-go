@@ -2,7 +2,6 @@ package csv_validate
 
 import (
 	"encoding/csv"
-	"fmt"
 	"os"
 	"strconv"
 
@@ -28,7 +27,8 @@ func ValidateCSVData(dbData map[string]db.Verify) (errorMessage string, err erro
 	records = append(records, headers)
 	for i, c := range csvData {
 		record := c.ToArray()
-		if _, ok := verifiedFields[c.Integration_ID]; !ok {
+
+		if _, ok := verifiedFields[c.Integration_ID]; ok {
 			continue
 		}
 		_, ok := dbData[c.Integration_ID]
@@ -52,7 +52,6 @@ func ValidateCSVData(dbData map[string]db.Verify) (errorMessage string, err erro
 
 		if resp == perfectEntry {
 			verifiedFields[c.Integration_ID] = true
-			fmt.Println(verifiedFields)
 
 		}
 		record = append(record, resp)
@@ -61,6 +60,7 @@ func ValidateCSVData(dbData map[string]db.Verify) (errorMessage string, err erro
 		}
 		errorMessage += resp
 		records = append(records, record)
+
 	}
 
 	csvFile, err := os.Create(file_name_errors)

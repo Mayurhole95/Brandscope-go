@@ -25,7 +25,6 @@ func (cs *CsvService) Validate(ctx context.Context, id string) (successMessage s
 	if !exist {
 		success = utils.SuccessMessage(false, errBrandIDExists, file_name_errors)
 		successMessage = utils.Marshal(success)
-		fmt.Println(successMessage)
 		return successMessage, nil
 	}
 
@@ -44,6 +43,10 @@ func (cs *CsvService) Validate(ctx context.Context, id string) (successMessage s
 	csvDataMap, err := cs.store.ListData(logdata.BrandID)
 	utils.ReturnError(err)
 	months, err := cs.store.ListMonths(logdata.ReleaseID)
+	utils.ReturnError(err)
+	brandName, err = cs.store.FindBrandName(logdata.BrandID)
+	utils.ReturnError(err)
+	releaseName, err = cs.store.FindReleaseName(logdata.ReleaseID)
 	utils.ReturnError(err)
 	dbMonths, err = ChangeDateFormat(months)
 	utils.ReturnError(err)

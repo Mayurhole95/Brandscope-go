@@ -18,6 +18,8 @@ const (
 	checkMonths = `SELECT delivery_months FROM releases WHERE id = $1`
 	findbyLogID = `SELECT original_file_location, release_id, brand_id
 	FROM release_uploads where id=$1;`
+	findBrandName   = `SELECT name FROM brands WHERE id=$1`
+	findReleaseName = `SELECT name FROM releases WHERE id=$1`
 )
 
 func (s *store) ListMonths(release_id string) (months []string, err error) {
@@ -33,6 +35,29 @@ func (s *store) ListMonths(release_id string) (months []string, err error) {
 	utils.ReturnError(err)
 
 	return months, err
+}
+
+func (s *store) FindBrandName(brand_id string) (brand_name string, err error) {
+	rows, err := s.db.Query(findBrandName, brand_id)
+	utils.ReturnError(err)
+	var row string
+	for rows.Next() {
+		err = rows.Scan(&row)
+	}
+	utils.ReturnError(err)
+
+	return row, err
+}
+func (s *store) FindReleaseName(release_id string) (release_name string, err error) {
+	rows, err := s.db.Query(findReleaseName, release_id)
+	utils.ReturnError(err)
+	var row string
+	for rows.Next() {
+		err = rows.Scan(&row)
+	}
+	utils.ReturnError(err)
+
+	return row, err
 }
 
 func (s *store) ListData(brand_id string) (data map[string]Verify, err error) {
