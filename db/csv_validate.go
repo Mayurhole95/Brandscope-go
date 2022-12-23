@@ -3,15 +3,14 @@ package db
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"strings"
 
+	"github.com/Mayurhole95/Brandscope-go/utils"
 	_ "github.com/lib/pq"
 )
 
 const (
 	findID              = `SELECT EXISTS(SELECT 1 FROM brands WHERE id = $1) AND EXISTS(SELECT 1 FROM releases WHERE id = $2)`
-	findtables          = `SELECT id FROM brands`
 	checkIntegrationID  = `SELECT EXISTS(SELECT 1 FROM size_breaks WHERE brand_id = $1 AND integration_id=$2 AND size=$3) AND EXISTS(SELECT 1 FROM products WHERE brand_id = $1 AND sku=$4 AND colour_code=$5)`
 	checkDuplicateEntry = `SELECT sb.Integration_id,sb.size,products.sku,products.colour_code
 	FROM size_breaks as sb
@@ -23,15 +22,15 @@ const (
 
 func (s *store) ListMonths(release_id string) (months []string, err error) {
 	rows, err := s.db.Query(checkMonths, release_id)
-	ReturnError(err)
+	utils.ReturnError(err)
 	for rows.Next() {
 		var row string
 		err = rows.Scan(&row)
 		row = strings.Trim(row, "{}")
 		months = strings.Split(row, ",")
-		ReturnError(err)
+		utils.ReturnError(err)
 	}
-	ReturnError(err)
+	utils.ReturnError(err)
 
 	return months, err
 }
@@ -39,14 +38,13 @@ func (s *store) ListMonths(release_id string) (months []string, err error) {
 func (s *store) ListData(brand_id string) (data map[string]Verify, err error) {
 	csvDataMap := make(map[string]Verify)
 	rows, err := s.db.Query(checkDuplicateEntry, brand_id)
-	ReturnError(err)
+	utils.ReturnError(err)
 	for rows.Next() {
 		var row entries
 		err = rows.Scan(&row.Integration_ID, &row.Size, &row.SKU, &row.Colour_code)
 		csvDataMap[row.Integration_ID] = Verify{row.Size, row.SKU, row.Colour_code}
-		ReturnError(err)
+		utils.ReturnError(err)
 	}
-
 	return csvDataMap, err
 }
 
@@ -54,7 +52,7 @@ func (s *store) FindLogID(ctx context.Context, log_id string) (row LogID, err er
 
 	err = WithDefaultTimeout(ctx, func(ctx context.Context) error {
 		rows, err := s.db.QueryContext(ctx, findbyLogID, log_id)
-		ReturnError(err)
+		utils.ReturnError(err)
 		for rows.Next() {
 			err = rows.Scan(
 				&row.Original_file_location, &row.ReleaseID, &row.BrandID,
@@ -73,7 +71,7 @@ func (s *store) FindID(ctx context.Context, brand_id string, release_id string) 
 
 	err = WithDefaultTimeout(ctx, func(ctx context.Context) error {
 		rows, err := s.db.QueryContext(ctx, findID, brand_id, release_id)
-		ReturnError(err)
+		utils.ReturnError(err)
 		for rows.Next() {
 			err = rows.Scan(
 				&exists,
@@ -105,11 +103,5 @@ func (s *store) FindIntegrationID(brand_id string, integration_id string, size s
 		return true, nil
 	} else {
 		return false, err
-	}
-}
-func ReturnError(err error) {
-	if err != nil {
-		fmt.Println("Error Occured :", err.Error())
-		return
 	}
 }

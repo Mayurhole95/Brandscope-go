@@ -1,5 +1,14 @@
 package csv_validate
 
+import (
+	"context"
+	"encoding/csv"
+	"os"
+
+	"github.com/Mayurhole95/Brandscope-go/db"
+	"github.com/Mayurhole95/Brandscope-go/utils"
+)
+
 type BrandHeader struct {
 	AttributeValue         string `csv:"AttributeValue"`
 	AttributeType          string `csv:"AttributeType"`
@@ -71,6 +80,79 @@ type BrandHeader struct {
 	AdditionalDetail5      string `csv:"AdditionalDetail5"`
 }
 
+func (b *BrandHeader) ToArray() []string {
+	return []string{
+		b.CatalogueOrder,
+		b.BrandscopeCarryOver,
+		b.Integration_ID,
+		b.Barcode,
+		b.SKU,
+		b.ProductName,
+		b.ProductColourCode,
+		b.ProductDisplayColour,
+		b.GenericColour,
+		b.SizeBreak,
+		b.AttributeValue,
+		b.AttributeType,
+		b.AttributeSequence,
+		b.DisplayWholesale,
+		b.DisplayWholesaleRange,
+		b.WholesalePriceOriginal,
+		b.WholesalePrice,
+		b.DisplayRetail,
+		b.RetailPriceOriginal,
+		b.RetailPrice,
+		b.PackUnits,
+		b.ProductMultiple,
+		b.AvailableMonths,
+		b.Divisions,
+		b.Collections,
+		b.Categories,
+		b.DiscountCategory,
+		b.ProductTags,
+		b.AgeGroup,
+		b.Gender,
+		b.BrandscopeHierarchy,
+		b.State,
+		b.PreOrderLeadTimeDays,
+		b.PreOrderMessage,
+		b.ProductRequirement1,
+		b.ProductSpecification1,
+		b.ProductSpecification2,
+		b.ProductSpecification3,
+		b.ProductSpecification4,
+		b.ProductSpecification5,
+		b.ProductSpecification6,
+		b.ProductSpecification7,
+		b.ProductSpecification8,
+		b.ProductSpecification9,
+		b.ProductSpecification10,
+		b.ProductSpecification11,
+		b.ProductSpecification12,
+		b.ProductSpecification13,
+		b.ProductSpecification14,
+		b.ProductSpecification15,
+		b.ProductChanges1,
+		b.ProductChanges2,
+		b.ProductChanges3,
+		b.ProductChanges4,
+		b.ProductChanges5,
+		b.AdditionalDetail1,
+		b.AdditionalDetail2,
+		b.AdditionalDetail3,
+		b.AdditionalDetail4,
+		b.AdditionalDetail5,
+		b.SalesTip,
+		b.MarketingSupport,
+		b.CompanyName,
+		b.BrandName,
+		b.ReleaseName,
+		b.SegmentNames,
+		b.AtsInIndent,
+		b.AtsInInSeason,
+	}
+}
+
 type Verify struct {
 	Size        string `db:"size"`
 	SKU         string `db:"sku"`
@@ -98,4 +180,25 @@ type LogID struct {
 	Original_file_location string `db:"original_file_location"`
 	ReleaseID              string `db:"release_id`
 	BrandID                string `db:"brand_id"`
+}
+
+var logdata db.LogID
+var dbMonths []string
+var file_name_errors string = "pride_priderelease_20221215114528_errors.csv"
+
+type Service interface {
+	Validate(ctx context.Context, id string) (successmessage string, err error)
+}
+
+var csvData = []BrandHeader{}
+
+func readHeaders() []string {
+	readCsvFile, err := os.Open(logdata.Original_file_location)
+	utils.ReturnError(err)
+	defer readCsvFile.Close()
+
+	csvReader := csv.NewReader(readCsvFile)
+	records, err := csvReader.Read()
+	utils.ReturnError(err)
+	return records
 }

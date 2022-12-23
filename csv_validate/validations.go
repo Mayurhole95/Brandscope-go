@@ -6,6 +6,8 @@ import (
 	"time"
 
 	"strconv"
+
+	"github.com/Mayurhole95/Brandscope-go/utils"
 )
 
 func AgeGroupValidations(s string) (err error) {
@@ -45,14 +47,36 @@ func AttributeValueValidation(s string) (err error) {
 	return nil
 }
 
+func AvailableMonthsValidations(s string) (err error) {
+	if s == "" {
+		return errAvailableMonthsEmpty
+	}
+	dates := strings.Split(s, ",")
+	if !Equal(dates, dbMonths) {
+		return errAvailableMonthsError
+	}
+	return nil
+}
+
+func Equal(a, b []string) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i, v := range a {
+		if v != b[i] {
+			return false
+		}
+	}
+	return true
+}
+
 func ChangeDateFormat(delivery_month []string) (months []string, err error) {
 	for i := 0; i < len(delivery_month); i++ {
 		date, err := time.Parse("2006-01-02", delivery_month[i])
-		ReturnError(err)
+		utils.ReturnError(err)
 		year, month, _ := date.Date()
 		delivery_month[i] = strings.ToUpper(month.String()[0:3] + strconv.Itoa(year)[2:4])
 	}
-	// fmt.Println(delivery_month)
 	return delivery_month, err
 }
 
@@ -174,15 +198,11 @@ func GenericColorValidation(s string) (err error) {
 
 func Integration_IDValidations(s string, i int) (err error) {
 	if s == "" {
-		// fmt.Println("Int id empty")
 		return errIntegration_IDEmpty
 	}
-	// fmt.Println(csvData)
-	// fmt.Println(s, "Hii")
 
 	for j := 1; j < i; j++ {
 		if s == csvData[j].Integration_ID {
-			// fmt.Println("Int id exists")
 			return errIntIDExists
 		}
 	}
@@ -256,7 +276,6 @@ func RetailPriceValidation(s string, s1 string) (err error) {
 
 	val1, err := strconv.ParseFloat(s1, 32)
 	if err != nil {
-		// fmt.Println(err)
 		return
 	}
 	if val, err := strconv.ParseFloat(s, 32); err != nil || val < 0 || val <= val1 || strings.ContainsAny(s, "$") {
@@ -273,7 +292,6 @@ func RetailPriceOriginalValidation(s string, s1 string) (err error) {
 	}
 	val1, err := strconv.ParseFloat(s1, 32)
 	if err != nil {
-		// fmt.Println(err)
 		return
 	}
 	if val, err := strconv.ParseFloat(s, 32); err != nil || val < 0 || val <= val1 || strings.ContainsAny(s, "$") {
@@ -316,11 +334,18 @@ func SKUValidations(s string, i int) (err error) {
 	}
 	for j := 1; j < i; j++ {
 		if s == csvData[j].SKU {
-			// fmt.Println("SKU exists")
 			return errSKUExists
 		}
 	}
 	return nil
+}
+
+func SpecificationValidation(specNum string, csvData string) (err string) {
+	if isAlphaNumeric(csvData) != nil {
+		err = specNum
+		return err
+	}
+	return
 }
 
 func StateValidation(s string) (err error) {
@@ -334,7 +359,6 @@ func UniqueProductValidations(s string, i int) (err error) {
 
 	for j := 1; j < i; j++ {
 		if strings.EqualFold(strings.ToLower(s), strings.ToLower(csvData[j].SKU+csvData[j].ProductColourCode+csvData[j].SizeBreak)) {
-			// fmt.Println("Similar product exists")
 			return errProductExists
 		} else if csvData[i].CompanyName == csvData[j].CompanyName {
 			return errCompanyDoesNotExist

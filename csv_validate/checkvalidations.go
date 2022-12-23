@@ -1,6 +1,8 @@
 package csv_validate
 
-import "strconv"
+import (
+	"strconv"
+)
 
 func CheckValidations(data BrandHeader, i int) (errorstring string, err error) {
 
@@ -48,7 +50,6 @@ func CheckValidations(data BrandHeader, i int) (errorstring string, err error) {
 		errorstring += "BrandscopeCarryOver==> BrandscopeCarryOver cannot be empty, "
 	} else if err == errBrandScopeCarryOverNotValid {
 		errorstring += "BrandscopeCarryOver==> BrandscopeCarryOver not Valid, "
-	} else {
 	}
 
 	err = BrandscopeHierarchyValidation(data.BrandscopeHierarchy)
@@ -68,11 +69,9 @@ func CheckValidations(data BrandHeader, i int) (errorstring string, err error) {
 		errorstring += "CatalogueOrder==> CatalogueOrder can't be empty, "
 	} else if err == errCatalogueOrderNotANumber {
 		errorstring += "CatalogueOrder==> CatalogueOrder should be a number, "
-	} else {
 	}
 
 	err = CategoriesValidation(data.Categories)
-	//fmt.Println(data.Categories)
 	if err == errInvalidCategories {
 		errorstring += "Categories Invalid"
 	}
@@ -191,7 +190,6 @@ func CheckValidations(data BrandHeader, i int) (errorstring string, err error) {
 		errorstring += "SKU==> Invalid Data .Entry should be alphanumeric, "
 	} else if err == errLength500 {
 		errorstring += "SKU==> Length should be les than 500, "
-	} else {
 	}
 
 	err = WholesalePriceValidation(data.WholesalePrice)
@@ -213,114 +211,92 @@ func CheckValidations(data BrandHeader, i int) (errorstring string, err error) {
 		errorstring += "Invalid State"
 	}
 
-	err = ProductSpecification1Validation(data.ProductSpecification1)
-	//fmt.Println(data.ProductSpecification1)
-	if err == errInvalidProductSpecification {
-		errorstring += "Invalid ProductSpecification1"
+	errstr := SpecificationValidation("1", data.ProductSpecification1)
+	if errstr == "1" {
+		errorstring += InvalidProductSpecification1
 	}
-	err = ProductSpecification2Validation(data.ProductSpecification2)
-	if err == errInvalidProductSpecification {
-		errorstring += "Invalid ProductSpecification2"
+	errstr = SpecificationValidation("2", data.ProductSpecification2)
+	if errstr == "2" {
+		errorstring += InvalidProductSpecification2
 	}
-	err = ProductSpecification3Validation(data.ProductSpecification3)
-	if err == errInvalidProductSpecification {
-		errorstring += "Invalid ProductSpecification3"
+	errstr = SpecificationValidation("3", data.ProductSpecification3)
+	if errstr == "3" {
+		errorstring += InvalidProductSpecification3
 	}
-	err = ProductSpecification4Validation(data.ProductSpecification4)
-	if err == errInvalidProductSpecification {
-		errorstring += "Invalid ProductSpecification4"
+	errstr = SpecificationValidation("4", data.ProductSpecification4)
+	if errstr == "4" {
+		errorstring += InvalidProductSpecification4
 	}
-	err = ProductSpecification5Validation(data.ProductSpecification5)
-	if err == errInvalidProductSpecification {
-		errorstring += "Invalid ProductSpecification5"
+	errstr = SpecificationValidation("5", data.ProductSpecification5)
+	if errstr == "5" {
+		errorstring += InvalidProductSpecification5
 	}
-	err = ProductSpecification6Validation(data.ProductSpecification6)
-	if err == errInvalidData {
-		errorstring += "ProductSpecification6 not valid"
-	}
-
-	err = ProductSpecification7Validation(data.ProductSpecification7)
-	if err == errInvalidData {
-		errorstring += "ProductSpecification7 not valid"
-	}
-	err = ProductSpecification8Validation(data.ProductSpecification8)
-	if err == errInvalidData {
-		errorstring += "ProductSpecification8 not valid"
+	errstr = SpecificationValidation("6", data.ProductSpecification6)
+	if errstr == "6" {
+		errorstring += InvalidProductSpecification6
 	}
 
-	err = ProductSpecification9Validation(data.ProductSpecification9)
-	if err == errInvalidData {
-		errorstring += "ProductSpecification9 not valid"
+	errstr = SpecificationValidation("7", data.ProductSpecification7)
+	if errstr == "7" {
+		errorstring += InvalidProductSpecification7
 	}
-	err = ProductSpecification10Validation(data.ProductSpecification10)
-	if err == errInvalidData {
-		errorstring += "ProductSpecification10 not valid"
-	}
-	err = ProductSpecification11Validation(data.ProductSpecification1)
-	//fmt.Println(data.ProductSpecification1)
-	if err == errInvalidProductSpecification {
-		errorstring += "Invalid ProductSpecification11"
-	}
-	err = ProductSpecification12Validation(data.ProductSpecification2)
-	if err == errInvalidProductSpecification {
-		errorstring += "Invalid ProductSpecification12"
-	}
-	err = ProductSpecification13Validation(data.ProductSpecification3)
-	if err == errInvalidProductSpecification {
-		errorstring += "Invalid ProductSpecification13"
-	}
-	err = ProductSpecification14Validation(data.ProductSpecification4)
-	if err == errInvalidProductSpecification {
-		errorstring += "Invalid ProductSpecification14"
-	}
-	err = ProductSpecification15Validation(data.ProductSpecification5)
-	if err == errInvalidProductSpecification {
-		errorstring += "Invalid ProductSpecification15"
+	errstr = SpecificationValidation("8", data.ProductSpecification8)
+	if errstr == "8" {
+		errorstring += InvalidProductSpecification8
 	}
 
-	err = ProductChanges1Validation(data.ProductChanges1)
-	if err == errInvalidProductChanges {
-		errorstring += "Invalid ProductChanges"
+	errstr = SpecificationValidation("9", data.ProductSpecification9)
+	if errstr == "9" {
+		errorstring += InvalidProductSpecification9
 	}
-	err = ProductChanges2Validation(data.ProductChanges2)
-	if err == errInvalidProductChanges {
-		errorstring += "Invalid ProductChanges"
-	}
-	err = ProductChanges3Validation(data.ProductChanges3)
-	if err == errInvalidProductChanges {
-		errorstring += "Invalid ProductChanges"
+	errstr = SpecificationValidation("10", data.ProductSpecification4)
+	if errstr == "10" {
+		errorstring += InvalidProductSpecification10
 	}
 
-	err = ProductChanges4Validation(data.ProductChanges2)
-	if err == errInvalidProductChanges {
-		errorstring += "Invalid ProductChanges"
+	errstr = SpecificationValidation("1", data.ProductChanges1)
+	if errstr == "1" {
+		errorstring += InvalidProductChanges1
 	}
-	err = ProductChanges5Validation(data.ProductChanges3)
-	if err == errInvalidProductChanges {
-		errorstring += "Invalid ProductChanges"
+	errstr = SpecificationValidation("2", data.ProductChanges2)
+	if errstr == "2" {
+		errorstring += InvalidProductChanges2
 	}
-
-	err = AdditionalDetail1Validation(data.AdditionalDetail1)
-	if err == errInvalidAdditionalDetail {
-		errorstring += "Invalid AdditionalDetail"
-	}
-	err = AdditionalDetail2Validation(data.AdditionalDetail2)
-	if err == errInvalidAdditionalDetail {
-		errorstring += "Invalid AdditionalDetail"
+	errstr = SpecificationValidation("3", data.ProductChanges3)
+	if errstr == "3" {
+		errorstring += InvalidProductChanges3
 	}
 
-	err = AdditionalDetail3Validation(data.AdditionalDetail1)
-	if err == errInvalidAdditionalDetail {
-		errorstring += "Invalid AdditionalDetail"
+	errstr = SpecificationValidation("4", data.ProductChanges4)
+	if errstr == "4" {
+		errorstring += InvalidProductChanges4
 	}
-	err = AdditionalDetail4Validation(data.AdditionalDetail2)
-	if err == errInvalidAdditionalDetail {
-		errorstring += "Invalid AdditionalDetail"
+	errstr = SpecificationValidation("5", data.ProductChanges5)
+	if errstr == "5" {
+		errorstring += InvalidProductChanges5
 	}
 
-	err = AdditionalDetail5Validation(data.AdditionalDetail1)
-	if err == errInvalidAdditionalDetail {
-		errorstring += "Invalid AdditionalDetail"
+	errstr = SpecificationValidation("1", data.AdditionalDetail1)
+	if errstr == "1" {
+		errorstring += InvalidAdditionalDetail1
+	}
+	errstr = SpecificationValidation("2", data.AdditionalDetail2)
+	if errstr == "2" {
+		errorstring += InvalidAdditionalDetail2
+	}
+
+	errstr = SpecificationValidation("3", data.AdditionalDetail3)
+	if errstr == "2" {
+		errorstring += InvalidAdditionalDetail3
+	}
+	errstr = SpecificationValidation("4", data.AdditionalDetail4)
+	if errstr == "2" {
+		errorstring += InvalidAdditionalDetail4
+	}
+
+	errstr = SpecificationValidation("5", data.AdditionalDetail5)
+	if errstr == "5" {
+		errorstring += InvalidAdditionalDetail5
 	}
 
 	if errorstring == "" {

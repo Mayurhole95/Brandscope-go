@@ -35,7 +35,6 @@ func main() {
 			Name:  "validate",
 			Usage: "run validations code",
 			Action: func(c *cli.Context) error {
-				// fmt.Println("Hii")
 				csv := csv_validate.NewService(dbstorer, logger)
 
 				csv.Validate(context.TODO(), c.Args().Get(0))
