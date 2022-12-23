@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/Mayurhole95/Brandscope-go/config"
+	"github.com/Mayurhole95/Brandscope-go/utils"
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
 )
@@ -36,10 +37,7 @@ func initDB() (err error) {
 	dbConfig := config.Database()
 	db, err = sqlx.Open(dbConfig.Driver(), dbConfig.ConnectionURL())
 
-	if err != nil {
-		fmt.Println("Error : ", err.Error())
-		return
-	}
+	utils.ReturnError(err)
 
 	if err = db.Ping(); err != nil {
 		fmt.Println("Error : ", err.Error())
